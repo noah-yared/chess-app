@@ -79,6 +79,8 @@ const startGame = async () => {
   window.move = null;
 
   if (window.gameType === "sockets")  {
+    (window.playerColor === "white") ? displayNames("You", "Opponent") 
+                                     : displayNames("Opponent", "You");
     document.getElementById("send-chat").addEventListener("click", () => {
       // const form = document.getElementById("message-form");
       // const formData = new FormData(form);

@@ -1,7 +1,6 @@
 const { Server } = require("socket.io");
 const { join } = require("path");
 const { randomUUID } = require("crypto");
-const { move } = require("./auth");
 
 let io;
 
@@ -75,7 +74,7 @@ module.exports = (server) => {
     socket.on("chatMessage", (message) => {
       console.log(`emitting message: ${message}`);
       let room = matchmakingConnections[sockets[socket.id]].room;
-      socket.to(room).emit("displayMessage", message, sockets[socket.id]);
+      socket.to(room).emit("displayMessage", message, "Opponent");
     });
     socket.on("gameOver", () => {
       let onlineRoom  = matchmakingConnections[sockets[socket.id]];
