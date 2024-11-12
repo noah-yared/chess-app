@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Online Match</title>
-  <link rel="stylesheet" href="../assets/styles/online-chess.css"/>
+  <link rel="stylesheet" href="http://127.0.0.1:3000/styles/online-chess.css"/>
   <script>
     const LIGHT = 'rgb(255, 255, 255)';
     const MEDIUM = 'rgb(255, 235, 200)';
@@ -225,9 +225,10 @@
     // }
     // (async () => await getUsername())();
     
-    let user = `Player${Math.floor(10*Math.random())}`
+    // let user = `Player${Math.floor(10*Math.random())}`
+    let uset = "You";
 
-    socket.emit("getUsername", user);
+    socket.emit("getUsername", "Opponent");
 
     socket.emit("findRoom");
 
@@ -238,6 +239,6 @@
     })
 
   </script>
-  <script src="../src/game.js"></script>
+  <script src="http://127.0.0.1:3000/game"></script>
 </body>
 </html>
