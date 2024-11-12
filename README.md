@@ -18,7 +18,7 @@ Play chess with a friend or yourself on the same laptop/computer in a single bro
 - To reset the server, hit **CTRL-c** in the terminal instance where the `node` server is running and rerun the command `node src/index`. Then, refresh the browser tab.
 
 ## Play online
-Simulate online play by playing against a friend or yourself in two different browser tabs on the same laptop/computer (chrome recommended).
+Simulate online play by playing against a friend or yourself in two different browser tabs (chrome recommended) on the same laptop/computer.
 ### Steps:
 - As in local play, start up the `flask` server by running `flask --app src/scripts/move_validation run` in terminal.
 - Likewise, in new terminal instance, run `node src/index` to start `node` server.
