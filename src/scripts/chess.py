@@ -1,6 +1,3 @@
-# Refactored!
-
-
 def reformat_board(chessboard):
     """
     Parameter(s): Takes list of lists of characters denoting each piece
@@ -1177,29 +1174,29 @@ if __name__ == "__main__":
     def parse_castling_privileges(privileges: str) -> set:
         return set(privileges)
 
-        #########################
+    #################################################################################
 
-        # fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w kqKQ -"
-        # board = parse_FEN(fen)[1][0]
-        # pieces = {location: piece.get_type() for (location, piece) in board.items()}
-        # print(pieces)
-        # print(parse_FEN(fen))
+    # fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w kqKQ -"
+    # board = parse_FEN(fen)[1][0]
+    # pieces = {location: piece.get_type() for (location, piece) in board.items()}
+    # print(pieces)
+    # print(parse_FEN(fen))
 
-        # def stringify_enpassant_squares(enpassant_squares):
-        # for r, c in enpassant_squares:
-        #     print(8 - r)
-        # return "".join(f"{chr(ord('a') + c)}{8-r}" for r, c in enpassant_squares) or "-"
+    # def stringify_enpassant_squares(enpassant_squares):
+    # for r, c in enpassant_squares:
+    #     print(8 - r)
+    # return "".join(f"{chr(ord('a') + c)}{8-r}" for r, c in enpassant_squares) or "-"
 
-        # def parse_algebraic_notation(square: str) -> tuple:
-        # return 8 - int(square[1]), ord(square[0]) - ord("a")
+    # def parse_algebraic_notation(square: str) -> tuple:
+    # return 8 - int(square[1]), ord(square[0]) - ord("a")
 
-        # def get_enpassant_squares(squares: str):
-        # if squares == "-":
-        #     return set()
-        # return {
-        #     parse_algebraic_notation(squares[i : i + 2])
-        #     for i in range(0, len(squares), 2)
-        # }
+    # def get_enpassant_squares(squares: str):
+    # if squares == "-":
+    #     return set()
+    # return {
+    #     parse_algebraic_notation(squares[i : i + 2])
+    #     for i in range(0, len(squares), 2)
+    # }
 
     # enpassant_squares = "c5f3f2c1"
 
@@ -1210,19 +1207,19 @@ if __name__ == "__main__":
 
     # move = ((7, 4), (7, 6))
     # fen = 'q3kb1r/4ppp1/2n1bn1p/pB6/8/2N2N2/PPPP1PPP/R1BQK2R w qkQK -'
-    move = ((2, 4), (1, 5))
-    fen = "r4bnr/ppp1p1kp/2n1Qp2/6pQ/8/8/PP1P1PPP/RNB2KNR w - -"
+    # move = ((2, 4), (1, 5))
+    # fen = "r4bnr/ppp1p1kp/2n1Qp2/6pQ/8/8/PP1P1PPP/RNB2KNR w - -"
 
     # move = ((0,4), (0,2))
     # fen1 = 'rn2kbnr/pppbqppp/4P3/8/8/2PP4/PP3PPP/RNBQKBNR b qkKQ -'
     # fen2 = 'r3kbnr/pppbqppp/2n1P3/8/8/1PPP4/P4PPP/RNBQKBNR b qkKQ -'
     # fen3 = 'r3kbnr/pppq1ppp/2n1b3/8/2P5/3PB3/PP3PPP/RN1QKBNR b kKQq -'
 
-    board_state = parse_FEN(fen)
-    new_game = game(board_state)
-    print(new_game.make_move(move))
-    print(new_game.check)
-    print(new_game.game_over)
+    # board_state = parse_FEN(fen)
+    # new_game = game(board_state)
+    # print(new_game.make_move(move))
+    # print(new_game.check)
+    # print(new_game.game_over)
 
     # _, (pieces, _, _), _, privileges, _ = parse_FEN(fen1)
     # _, (pieces, _, _), _, privileges, _ = parse_FEN(fen3)

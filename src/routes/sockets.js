@@ -84,7 +84,8 @@ module.exports = (server) => {
     }) 
   });
 
-
+  // need to setup custom room connections 
+  // (probably switch to custom rooms for online matchmaking)
   customRoom.on("connection", (socket) => {
     socket.on("getUsername", (username) => {
       sockets[socket.id] = username;
