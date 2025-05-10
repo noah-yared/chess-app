@@ -186,14 +186,14 @@ const startGame = async () => {
             result["checkmate"] = gameState["checkmate"];
             result["stalemate"] = gameState["stalemate"];
           }
-          if (!result["promotion"]) {
-            if (result["checkmate"]) displayCheckmate()
-            else if (result["stalemate"]) displayStalemate()
-            else if (result["check"]) { displayCheck(result["oppKing"]); wasPreviousMoveCheck = true;}
-          }
           if (window.gameType === "sockets" && window.isPlayersTurn) {
             window.socket.emit("move", { "move": playerMove, "promotionPiece": window.promotionPieceElement });
             window.promotionPieceElement = null;
+          }
+          if (!result["promotion"]) {
+            if (result["checkmate"]) requestAnimationFrame(setTimeout(displayCheckmate, 100)); // force repaint before displaying checkmate alert
+            else if (result["stalemate"]) requestAnimationFrame(setTimeout(displayStalemate, 100)); // force repaint before displaying stalemate alert
+            else if (result["check"]) { displayCheck(result["oppKing"]); wasPreviousMoveCheck = true;}
           }
           let notatedMove = getMoveNotation(playerMove, result)
           console.log(notatedMove);
@@ -378,15 +378,17 @@ const startGame = async () => {
   }
 
   const displayCheckmate = () => {
-    let checkmateElement = document.getElementById("checkmate");
-    checkmateElement.querySelector('p').textContent = `${getPlayerTurn() === "white" ? "White" : "Black"} wins by checkmate!` 
-    centerDialogBox(checkmateElement);
+    // let checkmateElement = document.getElementById("checkmate");
+    // checkmateElement.querySelector('p').textContent = `${getPlayerTurn() === "white" ? "White" : "Black"} wins by checkmate!` 
+    // centerDialogBox(checkmateElement);
+    alert(`${getPlayerTurn() === "white" ? "White" : "Black"} wins by checkmate!`);
   }
 
   const displayStalemate = () => {
-    let stalemateElement = document.getElementById("stalemate");
-    stalemateElement.querySelector('p').textContent = `Draw by stalemate!`;
-    centerDialogBox(stalemateElement);
+    // let stalemateElement = document.getElementById("stalemate");
+    // stalemateElement.querySelector('p').textContent = `Draw by stalemate!`;
+    // centerDialogBox(stalemateElement);
+    alert(`Draw by stalemate!`);
   }
 
   const displayAbandonment = () => {
