@@ -1115,5 +1115,4 @@ class game:
 
 if __name__ == "__main__":
     pass
-    print ("hello world") # make sure that the program doesnt have any runtime errors
-
+    print("hello world") # make sure that the program doesnt have any runtime errors
