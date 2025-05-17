@@ -1,12 +1,3 @@
-// import { loadSavedGameData, saveGameData } from './gameStateManager.js';
-// import { boardRenderer } from './renderBoard.js';
-
-// display click locations (scrolling-adjusted) in the console for reference
-document.getElementsByTagName("body")[0].addEventListener('click', e => {
-  console.log(`Location is ${e.clientX + window.scrollX}, ${e.clientY + window.scrollY}`)
-})
-
-
 const displayNames = (whiteName, blackName) => {
   const whiteNameElement = document.getElementById("white-name");
   whiteNameElement.querySelector('p').textContent = whiteName;
@@ -14,12 +5,6 @@ const displayNames = (whiteName, blackName) => {
   const blackNameElement = document.getElementById("black-name");
   blackNameElement.querySelector('p').textContent = blackName;
 }
-
-// const setupClocks = (timeControl) => {
-//   let timeRemaining = timeControl * 60;
-//   let startTime = new Date();
-//   // Need to implement -- made some progress in "getTime.js"
-// }
 
 const hideForm = () => {
   const mainContainer = document.querySelector('.main-container');
@@ -378,37 +363,19 @@ const startGame = async () => {
   }
 
   const displayCheckmate = () => {
-    // let checkmateElement = document.getElementById("checkmate");
-    // checkmateElement.querySelector('p').textContent = `${getPlayerTurn() === "white" ? "White" : "Black"} wins by checkmate!` 
-    // centerDialogBox(checkmateElement);
     alert(`${getPlayerTurn() === "white" ? "White" : "Black"} wins by checkmate!`);
   }
 
   const displayStalemate = () => {
-    // let stalemateElement = document.getElementById("stalemate");
-    // stalemateElement.querySelector('p').textContent = `Draw by stalemate!`;
-    // centerDialogBox(stalemateElement);
     alert(`Draw by stalemate!`);
   }
 
   const displayAbandonment = () => {
-    let abandonmentElement = document.getElementById("abandonment");
-    abandonmentElement.querySelector('p').textContent = `${getPlayerTurn() === "white" ? "Black" : "White"} wins by abandonment!` 
-    centerDialogBox(abandonmentElement);
+    alert(`${getPlayerTurn() === "white" ? "Black" : "White"} wins by abandonment!`);
   }
 
   const displayTimeout = () => {
-    let timeoutElement = document.getElementById("timeout");
-    timeoutElement.querySelector('p').textContent = `${getPlayerTurn() === "white" ? "Black" : "White"} wins by timeout!` 
-    centerDialogBox(timeoutElement);
-  }
-
-  const centerDialogBox = (dialogElement) => {
-    // const boardRect = document.getElementById("chessboard").getBoundingClientRect();
-    dialogElement.style.display = "flex";
-    // dialogElement.style.position = "relative";
-    // dialogElement.style.left = `${(boardRect.width - dialogElement.offsetWidth) / 2}px`;
-    // dialogElement.style.top = `${(boardRect.height - dialogElement.offsetHeight) / 2}px`;
+    alert(`${getPlayerTurn() === "white" ? "Black" : "White"} wins by timeout!`);
   }
 
   const dehighlightKingSquare = (kingLocation, kingOriginalLocation) => {
@@ -510,7 +477,6 @@ const main = async () => {
       } catch (error) {
         console.error(`Error when starting online game: ${error}`);
       } finally {
-        // end of promise chain
         console.log("game started!");
       }
     });
@@ -521,7 +487,6 @@ const main = async () => {
     } catch (error) {
       console.error(`Error when starting local game: ${error}`);
     } finally {
-      // end of promise chain
       console.log("game started!");
     }
   }
