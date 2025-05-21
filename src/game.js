@@ -26,6 +26,8 @@ export const GAME_STATE = {
   currentEndSquareElement: null,
 };
 
+window.gameState = GAME_STATE;
+
 const setupWindowSocketListeners = () => {
   window.socket.on("startGame", async () => {
     try {
