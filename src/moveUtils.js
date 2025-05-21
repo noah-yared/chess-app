@@ -4,8 +4,9 @@ import { displayNotatedMove, displayCapturedPiece, dehighlightKingSquare, displa
 import { getPlayerTurn, getPiece, getAlgebraicSquareNotation } from "./boardUtils.js";
 
 const makeMove = (startTile, endTile, result) => {
-  if (result["capturedPiece"] !== null && !result["enpassant"]) {
-    displayCapturedPiece(endTile.querySelector("img"), result["capturedPiece"]);
+  const capturedPieceImage = endTile.querySelector("img");
+  if (capturedPieceImage && !result["enpassant"]) {
+    displayCapturedPiece(capturedPieceImage, capturedPieceImage.className);
   }
   endTile.innerHTML = startTile.innerHTML;
   startTile.innerHTML = "";
