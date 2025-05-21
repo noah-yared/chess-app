@@ -1,7 +1,7 @@
 import { GAME_STATE } from "./game.js";
 import { validateMove, identifyGameStateAfterPiecePromotion } from "./server.js";
 import { displayNotatedMove, displayCapturedPiece, dehighlightKingSquare, displayCheck, displayCheckmate, displayStalemate, displayOpponentPromotion } from "./uiHelpers.js";
-import { getPlayerTurn, getPiece, getAlgebraicSquareNotation } from "./boardUtils.js";
+import { getPlayerTurn, getPiece, getAlgebraicSquareNotation, updatePromotedPawnFEN } from "./boardUtils.js";
 
 const makeMove = (startTile, endTile, result) => {
   const capturedPieceImage = endTile.querySelector("img");
@@ -46,17 +46,17 @@ const handleCastledMove = (move) => {
   rookInitialSquare.innerHTML = "";
 }
 
-const handlePawnPromotion = (move) => {
+const setupPawnPromotionOptions = (move) => {
   let color = move[1][0] === 0 ? "white" : "black";
   let promotionOptionsElement = document.getElementById(`promotion-options-${color}`);
-  promotionOptionsElement.style.display = "grid"; 
+  promotionOptionsElement.style.display = "grid";
   promotionOptionsElement.style.position = "absolute";
   let finalSquareRect = getPiece(move[1]).getBoundingClientRect();
   let width = promotionOptionsElement.offsetWidth;
   if (move[1][1] < 4) {
     promotionOptionsElement.style.left = `${finalSquareRect.left + window.scrollX}px`;
   } else {
-    promotionOptionsElement.style.left = `${finalSquareRect.right + window.scrollX - width}px`; 
+    promotionOptionsElement.style.left = `${finalSquareRect.right + window.scrollX - width}px`;
   }
   let height = promotionOptionsElement.offsetHeight;
   if (move[1][0] === 0) {
@@ -74,6 +74,15 @@ const pollHasUserChosenPromotionPiece = async () => {
   }
 }
 
+const handlePromotionMove = async (move, moveResult) => {
+  console.log(`move: ${move}, moveResult: ${moveResult}`);
+  GAME_STATE.hasUserChosenPromotionPiece = false;
+  setupPawnPromotionOptions(move);
+  await pollHasUserChosenPromotionPiece();
+  updatePromotedPawnFEN(move, window.promotionId);
+  return await identifyGameStateAfterPiecePromotion(moveResult["oppKing"]);
+}
+
 export const handleMove = async (playerMoveInfo, startSquareElement, endSquareElement) => {
   let moveMade = false, playerMove = playerMoveInfo, result;
   window.move = playerMove.move ?? playerMove;
@@ -88,7 +97,7 @@ export const handleMove = async (playerMoveInfo, startSquareElement, endSquareEl
     GAME_STATE.boardFEN = result.fen;
     GAME_STATE.boardStates.push(result.fen);
     if (GAME_STATE.wasPreviousMoveCheck) {
-      dehighlightKingSquare(result["allyKing"], playerMove[0]);
+      dehighlightKingSquare(result["allyKing"], window.move[0]);
       GAME_STATE.wasPreviousMoveCheck = false;
     }
     makeMove(startSquareElement, endSquareElement, result)
@@ -98,23 +107,27 @@ export const handleMove = async (playerMoveInfo, startSquareElement, endSquareEl
       handleCastledMove(playerMove);
     } else if (result["promotion"]) {
       if (window.gameType !== "sockets" || window.isPlayersTurn) {
-        GAME_STATE.hasUserChosenPromotionPiece = false;
-        handlePawnPromotion(playerMove);
-        await pollHasUserChosenPromotionPiece();
-        const state = await identifyGameStateAfterPiecePromotion(result["oppKing"]);
-        result = { ...result, ...state };
+        const updatedState = await handlePromotionMove(playerMove, result);
+        result = { ...result, ...updatedState };
       } else {
-        displayOpponentPromotion(playerMoveInfo)
+        displayOpponentPromotion(playerMoveInfo);
+        updatePromotedPawnFEN(playerMoveInfo.move, playerMoveInfo.promotionId);
       }
     }
     if (result["checkmate"]) requestAnimationFrame(() => setTimeout(displayCheckmate, 100)); // force repaint before displaying checkmate alert
     else if (result["stalemate"]) requestAnimationFrame(() => setTimeout(displayStalemate, 100)); // force repaint before displaying stalemate alert
     else if (result["check"]) { displayCheck(result["oppKing"]); GAME_STATE.wasPreviousMoveCheck = true; }
-    const notatedMove = playerMoveInfo.notatedMove ?? getMoveNotation(playerMoveInfo, result)
+    const notatedMove = playerMoveInfo.notatedMove ?? getMoveNotation(playerMoveInfo, result);
     GAME_STATE.moves.push(notatedMove);
     displayNotatedMove(notatedMove); // add move to display
     if (window.gameType === "sockets" && window.isPlayersTurn) {
-      window.socket.emit("move", { "move": playerMove, "result": result, "promotionPiece": window.promotionPieceElement, "notatedMove": notatedMove });
+      window.socket.emit("move", { 
+        "move": playerMove, 
+        "result": result,
+        "notatedMove": notatedMove,
+        "promotionPiece": window.promotionPieceElement,
+        "promotionId": window.promotionId,
+      });
       window.promotionPieceElement = null;
     }
   } 

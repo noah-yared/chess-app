@@ -60,8 +60,6 @@ export const setupPromotionPieces = () => {
       window.promotionPieceElement = promotionPiece.innerHTML; // store promotionPiece.innerHTML in global var
       window.promotionId = promotionPiece.id;
 
-      updatePromotedPawnFEN(window.move, promotionPiece.id);
-
       let color = window.move[1][0] === 0 ? "white" : "black";
       let promotionOptionsGrid = document.getElementById(`promotion-options-${color}`);
       promotionOptionsGrid.style.display = "none";
