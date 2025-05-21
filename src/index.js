@@ -14,7 +14,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/styles', express.static(join(__dirname, "../assets/styles")));
 app.use('/images', express.static(join(__dirname, "../assets/images")));
-app.use('/game', express.static(join(__dirname, "./game.js"))); 
+app.use('/scripts', express.static(join(__dirname, "../src")));
+// app.use('/game', express.static(join(__dirname, "./game.js"))); 
 
 const matchRoutes = require("./routes/match.js");
 app.use(matchRoutes);
