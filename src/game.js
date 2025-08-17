@@ -54,12 +54,13 @@ const pollHasUserSelectedGameSettings = async () => {
   }
 }
 
+console.log("about to setup form");
 (window.gameType !== "sockets") && setupForm();
 
 const startGame = async () => {
   window.gameOver = false; window.promotionPieceElement = null; window.move = null;
   // setup event listeners
-  setupMessageBox();
+  (window.gameType === "sockets") && setupMessageBox();
   setupPromotionPieces();
   setupBoardTiles();
 }
