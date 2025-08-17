@@ -2,7 +2,7 @@ import { GAME_STATE } from "./game.js";
 
 export const validateMove = async (move) => {
   console.log(`Validating ${move}`);
-  const res = await fetch("http://localhost:5000/api/validate-move", {
+  const res = await fetch("http://localhost:5050/api/validate-move", {
     "method": "POST",
     "headers": {
       "Accept": "application/json",
@@ -17,11 +17,11 @@ export const validateMove = async (move) => {
 }
 
 export const identifyGameStateAfterPiecePromotion = async (kingLocation) => {
-  const res = await fetch("http://localhost:5000/api/promotion-check", {
+  const res = await fetch("http://localhost:5050/api/promotion-check", {
     "method": "POST",
     "headers": {
       "Accept": "application/json",
-      "Content-type": "application/json"
+      "Content-Type": "application/json"
     },
     "body": JSON.stringify({
       "fen": GAME_STATE.boardFEN,
