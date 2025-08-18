@@ -1,0 +1,55 @@
+{
+  "name": "chess-app",
+  "description": "A modern web-based chess interface built with React, TypeScript, and Vite, featuring a custom C++ chess engine backend.",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "engine:configure": "cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./local-install -S engine -B engine/build",
+    "engine:build": "cmake --build engine/build --target engine && cmake --build engine/build --target engine_tests",
+    "engine:install": "cmake --install engine/build",
+    "engine:setup": "npm run engine:configure && npm run engine:build && npm run engine:install",
+    "engine:test": "ctest --test-dir engine/build --output-on-failure",
+    "engine:clean": "rm -rf engine/build",
+    "setup": "npm install && npm run engine:setup && npm run engine:test && echo && echo 'Project setup complete!'",
+    "setup:fast": "npm install && npm run engine:setup && echo && echo 'Project setup complete (tests skipped)!'",
+    "dev:frontend": "vite",
+    "dev:server": "tsx watch server/index.ts",
+    "dev:full": "concurrently \"npm run dev:frontend\" \"npm run dev:server\"",
+    "build": "tsc -b && vite build",
+    "build:full": "npm run build",
+    "start:server": "tsx server/index.ts",
+    "start:full": "concurrently \"npm run start:server\" \"npm run preview\"",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.29.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.5.2",
+    "concurrently": "^9.1.0",
+    "eslint": "^9.29.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.2.0",
+    "tsx": "^4.19.2",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.34.1",
+    "vite": "^7.0.0"
+  }
+}
