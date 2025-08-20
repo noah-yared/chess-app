@@ -46,10 +46,13 @@ export default function Tile({
       onClick={handleClick}
     >
       {occupied && pieceOnTile && (
-        <img src={`../../pieces/${pieceOnTile.color}${pieceOnTile.type}.png`} width={60} height={60}/>
+        <img src={`../../pieces/${pieceOnTile.color}${pieceOnTile.type}.png`} width={60} height={60} className="piece-icon" /> 
       )}
-      {isDestinationTile && (
-        <img src={`../../target.png`} width={20} height={20}/>
+      {isDestinationTile && !occupied && (
+        <img src={`../../target.png`} className="target-icon" id="empty" />
+      )}
+      {isDestinationTile && occupied && (
+        <img src={`../../occupied-target.png`} className="target-icon" id="occupied" />
       )}
     </div>
   )
