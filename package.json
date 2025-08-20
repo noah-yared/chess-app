@@ -1,5 +1,4 @@
-{
-  "name": "chess-app",
+{ "name": "chess-app",
   "description": "A modern web-based chess interface built with React, TypeScript, and Vite, featuring a custom C++ chess engine backend.",
   "private": true,
   "version": "0.0.1",
@@ -8,7 +7,7 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "engine:configure": "cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./local-install -S engine -B engine/build",
+    "engine:configure": "cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./local-install -DINSTALL_ENGINE=ON -S engine -B engine/build",
     "engine:build": "cmake --build engine/build --target engine && cmake --build engine/build --target engine_tests",
     "engine:install": "cmake --install engine/build",
     "engine:setup": "npm run engine:configure && npm run engine:build && npm run engine:install",

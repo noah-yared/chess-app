@@ -9,7 +9,7 @@ export class Engine {
   private static readonly engineBinaryPath: string = Engine.getEngineBinaryPath();
 
   private static getEngineBinaryPath(): string {
-    const engineConfigPath: string = join(cwd(), 'engine_config.json');
+    const engineConfigPath: string = join(cwd(), 'engine', 'engine_config.json');
     const contents: string = fs.readFileSync(engineConfigPath, { encoding: "utf-8" });
     const config = JSON.parse(contents);
     return config.enginePath!; // should not be undefined
