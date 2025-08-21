@@ -11,12 +11,13 @@ export default function Tile({
   setSecondSelectedTile,
   turn,
   isGameOver,
-  isDestinationTile
+  isDestinationTile,
+  engineSide
 }: TileProps) {
 
   const handleClick: () => void = () => {
     console.log('clicked square: ', notation);
-    if (isGameOver) {
+    if (isGameOver || turn === engineSide) {
       return;
     }
     if (firstSelectedTile === notation) {

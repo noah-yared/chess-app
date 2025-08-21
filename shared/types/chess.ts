@@ -48,4 +48,5 @@ export type TileProps = {
   turn: Color,
   isGameOver: boolean,
   isDestinationTile: boolean,
+  engineSide: Color,
 };

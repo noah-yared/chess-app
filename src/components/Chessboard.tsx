@@ -19,10 +19,10 @@ export default function Chessboard({
   const validPlayerMoves = useRef<MoveList>(INITIAL_VALID_MOVES);
 
   useEffect(() => {
-    if (isGameOver)
+    if (isGameOver || turn === engineSide)
       return;
     // make sure that its the player's turn to move (i.e. not engine's turn)
-    if (firstSelectedTile && secondSelectedTile && turn !== engineSide) {
+    if (firstSelectedTile && secondSelectedTile) {
       handlePlayerMove(fen, setFen, setBoard, firstSelectedTile, secondSelectedTile, turn, setTurn, setIsGameOver, validPlayerMoves);
       
       // reset selected tiles
@@ -33,21 +33,20 @@ export default function Chessboard({
       setFen, setBoard, setTurn, setFirstSelectedTile, setSecondSelectedTile, setIsGameOver]);
 
   useEffect(() => {
-    if (isGameOver)
+    if (isGameOver || turn !== engineSide)
       return;
-    // engine is always black
-    if (turn === engineSide) {
-      const makeEngineMove = async () => {
-        const engine = new EngineAPI(new Client());
-        const { newFen, legalMoves } = await engine.getEngineResponse(fen);
-        setFen(newFen);
-        setBoard(fenToBoard(newFen));
-        setTurn('w');
-        setIsGameOver(legalMoves.size === 0);
-        validPlayerMoves.current = legalMoves;
-      }
-      makeEngineMove();
+
+    const makeEngineMove = async () => {
+      const engine = new EngineAPI(new Client());
+      const { newFen, legalMoves } = await engine.getEngineResponse(fen);
+      setFen(newFen);
+      setBoard(fenToBoard(newFen));
+      setTurn(engineSide === 'w' ? 'b' : 'w');
+      setIsGameOver(legalMoves.size === 0);
+      validPlayerMoves.current = legalMoves;
     }
+
+    makeEngineMove();
   }, [turn, engineSide, fen, setFen, setBoard, setTurn, isGameOver, setIsGameOver]);
 
 
@@ -70,7 +69,8 @@ export default function Chessboard({
                        setSecondSelectedTile={setSecondSelectedTile}
                        turn={turn}
                        isGameOver={isGameOver}
-                       isDestinationTile={isDestinationTile} />;
+                       isDestinationTile={isDestinationTile}
+                       engineSide={engineSide} />;
         });
       })}
     </div>
