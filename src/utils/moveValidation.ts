@@ -23,6 +23,7 @@ export async function handlePlayerMove(
   setBoard: (board: (Piece | null)[][]) => void,
   from: Square,
   to: Square,
+  setHighlightedTiles: (highlightedTiles: {from: Square, to: Square} | null) => void,
   turn: Color,
   setTurn: (turn: Color) => void,
   setIsGameOver: (isGameOver: boolean) => void,
@@ -47,7 +48,7 @@ export async function handlePlayerMove(
   setBoard(fenToBoard(updatedFen))
   setTurn(turn === 'w' ? 'b' : 'w');
   setIsGameOver(legalMoves.size === 0);
-
+  setHighlightedTiles({from, to});
   // update legal moves list
   validPlayerMoves.current = legalMoves;
   console.log('legalMoves', legalMoves);

@@ -9,6 +9,8 @@ export default function Game({ engineSide }: { engineSide?: Color }) {
   const [turn, setTurn] = useState<Color>('w');
   const [firstSelectedTile, setFirstSelectedTile] = useState<Square | null>(null);
   const [secondSelectedTile, setSecondSelectedTile] = useState<Square | null>(null);
+  const [highlightedTiles, setHighlightedTiles] = useState<{from: Square, to: Square} | null>(null);
+  const [handlingMove, setHandlingMove] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
 
   return (
@@ -24,6 +26,10 @@ export default function Game({ engineSide }: { engineSide?: Color }) {
         setFirstSelectedTile={setFirstSelectedTile}
         secondSelectedTile={secondSelectedTile}
         setSecondSelectedTile={setSecondSelectedTile}
+        highlightedTiles={highlightedTiles}
+        setHighlightedTiles={setHighlightedTiles}
+        handlingMove={handlingMove}
+        setHandlingMove={setHandlingMove}
         isGameOver={isGameOver}
         setIsGameOver={setIsGameOver}
         engineSide={engineSide ?? 'b'} // default to computer playing black

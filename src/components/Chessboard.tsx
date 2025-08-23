@@ -13,37 +13,43 @@ export default function Chessboard({
   turn, setTurn,
   firstSelectedTile, setFirstSelectedTile,
   secondSelectedTile, setSecondSelectedTile,
+  highlightedTiles, setHighlightedTiles,
+  handlingMove, setHandlingMove,
   isGameOver, setIsGameOver,
   engineSide
 }: ChessboardProps) {
   const validPlayerMoves = useRef<MoveList>(INITIAL_VALID_MOVES);
-
   useEffect(() => {
-    if (isGameOver || turn === engineSide)
+    if (isGameOver || turn === engineSide || handlingMove)
       return;
     // make sure that its the player's turn to move (i.e. not engine's turn)
     if (firstSelectedTile && secondSelectedTile) {
-      handlePlayerMove(fen, setFen, setBoard, firstSelectedTile, secondSelectedTile, turn, setTurn, setIsGameOver, validPlayerMoves);
-      
+      setHandlingMove(true);
+      handlePlayerMove(fen, setFen, setBoard, firstSelectedTile, secondSelectedTile,
+        setHighlightedTiles, turn, setTurn, setIsGameOver, validPlayerMoves);
       // reset selected tiles
       setFirstSelectedTile(null);
       setSecondSelectedTile(null);
+      setHandlingMove(false);
     }
   }, [firstSelectedTile, secondSelectedTile, turn, engineSide, fen, isGameOver,
       setFen, setBoard, setTurn, setFirstSelectedTile, setSecondSelectedTile, setIsGameOver]);
 
   useEffect(() => {
-    if (isGameOver || turn !== engineSide)
+    if (isGameOver || turn !== engineSide || handlingMove)
       return;
 
     const makeEngineMove = async () => {
+      setHandlingMove(true);
       const engine = new EngineAPI(new Client());
-      const { newFen, legalMoves } = await engine.getEngineResponse(fen);
+      const { response, newFen, legalMoves } = await engine.getEngineResponse(fen);
       setFen(newFen);
       setBoard(fenToBoard(newFen));
       setTurn(engineSide === 'w' ? 'b' : 'w');
       setIsGameOver(legalMoves.size === 0);
+      setHighlightedTiles(response);
       validPlayerMoves.current = legalMoves;
+      setHandlingMove(false);
     }
 
     makeEngineMove();
@@ -54,15 +60,18 @@ export default function Chessboard({
     <div className='chessboard'>
       {board.flatMap((row, rowIndex) => {
         return row.map((tile, colIndex) => {
-          const color = (rowIndex + colIndex) % 2 === 0 ? SQUARE_COLORS.LIGHT : SQUARE_COLORS.DARK;
+          const defaultBgColor = (rowIndex + colIndex) % 2 === 0 ? SQUARE_COLORS.LIGHT : SQUARE_COLORS.DARK;
           const notation = `${FILES[colIndex]}${RANKS[rowIndex]}` as const;
+          const { from, to } = highlightedTiles ?? { from: null, to: null };
+          const bgColor = from === notation || to === notation  ? 'lightgreen' :
+            notation === firstSelectedTile ? 'yellow' : defaultBgColor;
           const isDestinationTile = firstSelectedTile !== null && secondSelectedTile === null &&
             (validPlayerMoves.current.get(firstSelectedTile)?.some(other => other.to === notation) ?? false);
           return <Tile key={notation}
                        notation={notation} 
                        occupied={tile !== null} 
                        pieceOnTile={tile} 
-                       bgColor={(notation === firstSelectedTile) ? 'yellow' : color}
+                       bgColor={bgColor}
                        firstSelectedTile={firstSelectedTile}
                        setFirstSelectedTile={setFirstSelectedTile}
                        secondSelectedTile={secondSelectedTile}
