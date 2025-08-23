@@ -1,6 +1,8 @@
 export type PieceType = 'p' | 'r' | 'n' | 'b' | 'q' | 'k';
 export type Color = 'w' | 'b';
 
+export type Difficulty = 'beginner' | 'novice' | 'intermediate' | 'advanced' | 'expert' | 'master';
+
 export type Piece = {
   type: PieceType,
   color: Color
@@ -20,6 +22,22 @@ export type Move = {
 
 export type MoveList = Map<Square, Array<{to: Square, promoting: boolean}>>;
 
+export type LoggerProps = {
+  turn: Color,
+  engineSide: Color,
+  isCurrentKingInCheck: boolean,
+  isGameOver: boolean
+};
+
+export type MenuProps = {
+  engineSide: Color,
+  setEngineSide: (side: Color) => void,
+  difficulty: Difficulty,
+  setDifficulty: (difficulty: Difficulty) => void,
+  isGameStarted: boolean,
+  setIsGameStarted: (isGameStarted: boolean) => void,
+}
+
 export type ChessboardProps = {
   fen: string,
   setFen: (fen: string) => void,
@@ -35,9 +53,13 @@ export type ChessboardProps = {
   setHighlightedTiles: (highlightedTiles: {from: Square, to: Square} | null) => void,
   handlingMove: boolean,
   setHandlingMove: (handlingMove: boolean) => void,
+  isCurrentKingInCheck: boolean,
+  setIsCurrentKingInCheck: (isCurrentKingInCheck: boolean) => void,
   isGameOver: boolean,
   setIsGameOver: (isGameOver: boolean) => void,
   engineSide: Color,
+  isGameStarted: boolean,
+  difficulty: Difficulty
 };
 
 export type TileProps = {
@@ -50,6 +72,8 @@ export type TileProps = {
   secondSelectedTile: Square | null,
   setSecondSelectedTile: (tile: Square | null) => void,
   turn: Color,
+  isCurrentKingInCheck: boolean,
+  isGameStarted: boolean,
   isGameOver: boolean,
   isDestinationTile: boolean,
   engineSide: Color,

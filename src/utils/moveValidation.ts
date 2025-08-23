@@ -24,6 +24,7 @@ export async function handlePlayerMove(
   from: Square,
   to: Square,
   setHighlightedTiles: (highlightedTiles: {from: Square, to: Square} | null) => void,
+  setIsCurrentKingInCheck: (isCurrentKingInCheck: boolean) => void,
   turn: Color,
   setTurn: (turn: Color) => void,
   setIsGameOver: (isGameOver: boolean) => void,
@@ -44,6 +45,9 @@ export async function handlePlayerMove(
     engine.updateFen(fen, {from, to, promo}),
     engine.getLegalMoves(fen),
   ]);
+  const isKingInCheck = await engine.isKingInCheck(updatedFen);
+  console.log('isKingInCheck=' + isKingInCheck);
+  setIsCurrentKingInCheck(isKingInCheck);
   setFen(updatedFen);
   setBoard(fenToBoard(updatedFen))
   setTurn(turn === 'w' ? 'b' : 'w');

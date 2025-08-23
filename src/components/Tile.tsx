@@ -29,14 +29,16 @@ export default function Tile({
   secondSelectedTile,
   setSecondSelectedTile,
   turn,
+  isCurrentKingInCheck,
   isGameOver,
   isDestinationTile,
+  isGameStarted,
   engineSide
 }: TileProps) {
 
   const handleClick: () => void = () => {
     console.log('clicked square: ', notation);
-    if (isGameOver || turn === engineSide) {
+    if (!isGameStarted || isGameOver || turn === engineSide) {
       return;
     }
     if (firstSelectedTile === notation) {
@@ -57,10 +59,14 @@ export default function Tile({
     setSecondSelectedTile(null);
   };
 
+  const isCheckedKing = isCurrentKingInCheck && pieceOnTile?.type === 'k' && pieceOnTile?.color === turn;
+  if (isCheckedKing)
+    console.warn("handling checked king, should be painting checked kings square red");
+  
   return (
     <div 
-      className={`${notation} ${bgColor}`} 
-      style={{ backgroundColor: bgColor }}
+      className={`${notation} ${bgColor} ${isCheckedKing ? 'checked-king' : ''}`} 
+      style={{ backgroundColor: (!isCheckedKing ? bgColor : undefined) }}
       onClick={handleClick}
     >
       {occupied && pieceOnTile && (

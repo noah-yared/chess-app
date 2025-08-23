@@ -8,41 +8,67 @@ import { Client } from "../utils/client";
 import { fenToBoard } from "../utils/helpers";
 
 export default function Chessboard({
-  fen, setFen,
-  board, setBoard,
-  turn, setTurn,
-  firstSelectedTile, setFirstSelectedTile,
-  secondSelectedTile, setSecondSelectedTile,
-  highlightedTiles, setHighlightedTiles,
-  handlingMove, setHandlingMove,
-  isGameOver, setIsGameOver,
-  engineSide
+  fen,
+  setFen,
+  board,
+  setBoard,
+  turn,
+  setTurn,
+  firstSelectedTile,
+  setFirstSelectedTile,
+  secondSelectedTile,
+  setSecondSelectedTile,
+  highlightedTiles,
+  setHighlightedTiles,
+  handlingMove,
+  setHandlingMove,
+  isCurrentKingInCheck,
+  setIsCurrentKingInCheck,
+  isGameOver,
+  setIsGameOver,
+  isGameStarted,
+  engineSide,
+  difficulty
 }: ChessboardProps) {
   const validPlayerMoves = useRef<MoveList>(INITIAL_VALID_MOVES);
   useEffect(() => {
-    if (isGameOver || turn === engineSide || handlingMove)
+    if (!isGameStarted || isGameOver || turn === engineSide || handlingMove)
       return;
     // make sure that its the player's turn to move (i.e. not engine's turn)
     if (firstSelectedTile && secondSelectedTile) {
       setHandlingMove(true);
       handlePlayerMove(fen, setFen, setBoard, firstSelectedTile, secondSelectedTile,
-        setHighlightedTiles, turn, setTurn, setIsGameOver, validPlayerMoves);
+        setHighlightedTiles, setIsCurrentKingInCheck, turn, setTurn, setIsGameOver,
+        validPlayerMoves);
       // reset selected tiles
       setFirstSelectedTile(null);
       setSecondSelectedTile(null);
       setHandlingMove(false);
     }
-  }, [firstSelectedTile, secondSelectedTile, turn, engineSide, fen, isGameOver,
-      setFen, setBoard, setTurn, setFirstSelectedTile, setSecondSelectedTile, setIsGameOver]);
+  }, [
+    firstSelectedTile,
+    secondSelectedTile,
+    turn,
+    engineSide,
+    fen,
+    isGameOver,
+    setFen,
+    setBoard,
+    setTurn,
+    setFirstSelectedTile,
+    setSecondSelectedTile,
+    setIsGameOver
+  ]);
 
   useEffect(() => {
-    if (isGameOver || turn !== engineSide || handlingMove)
+    if (!isGameStarted || isGameOver || turn !== engineSide || handlingMove)
       return;
 
     const makeEngineMove = async () => {
       setHandlingMove(true);
       const engine = new EngineAPI(new Client());
-      const { response, newFen, legalMoves } = await engine.getEngineResponse(fen);
+      const { response, newFen, legalMoves } = await engine.getEngineResponse(fen, difficulty);
+      setIsCurrentKingInCheck(await engine.isKingInCheck(newFen));
       setFen(newFen);
       setBoard(fenToBoard(newFen));
       setTurn(engineSide === 'w' ? 'b' : 'w');
@@ -53,7 +79,17 @@ export default function Chessboard({
     }
 
     makeEngineMove();
-  }, [turn, engineSide, fen, setFen, setBoard, setTurn, isGameOver, setIsGameOver]);
+  }, [
+    turn,
+    engineSide,
+    fen,
+    setFen,
+    setBoard,
+    setTurn,
+    isGameOver,
+    setIsGameOver,
+    isGameStarted
+  ]);
 
 
   return (
@@ -77,6 +113,8 @@ export default function Chessboard({
                        secondSelectedTile={secondSelectedTile}
                        setSecondSelectedTile={setSecondSelectedTile}
                        turn={turn}
+                       isCurrentKingInCheck={isCurrentKingInCheck}
+                       isGameStarted={isGameStarted}
                        isGameOver={isGameOver}
                        isDestinationTile={isDestinationTile}
                        engineSide={engineSide} />;

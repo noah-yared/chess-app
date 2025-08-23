@@ -48,13 +48,19 @@ export class Engine {
     return moves;
   }
 
-  public static computeEngineMove(fen: string, depth: number = 5): Move {
+  public static computeEngineMove(fen: string, depth: number): Move {
     const result = Engine.invokeEngine("--find-best", fen , "-d", `${depth}`);
     const match = result.match(/(?<from>[a-h][1-8])(?<to>[a-h][1-8])(?<promo>[nrbq]?)/);
     const { from, to, promo } = match!.groups!;
     if (promo.length === 0)
       return { from: from as Square, to: to as Square } as const;
     return { from: from as Square, to: to as Square, promo: promo as Promotion } as const;
+  }
+
+  public static computeKingInCheck(fen: string): boolean {
+    const result = Engine.invokeEngine("--king-in-check", fen);
+    const match = result.match(/(true|false)/);
+    return match![0] === 'true';
   }
 
   public static computeUpdatedFen(fen: string, move: Move): string {
