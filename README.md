@@ -68,12 +68,13 @@ npm run setup # may take ~1 minute as engine tests are run
 npm run setup:fast
 ```
 
-4. Start the dev server and frontend:
+4. Build and start the production server and frontend:
 ```bash
-npm run dev:full
+npm run build:full
+npm run start:full
 ```
 
-The application will be available at `http://localhost:5173`.
+The application url should be printed to the console after running `npm run start:full`, likely defaults to `http://localhost:4173`.
 
 ## API Endpoints
 
