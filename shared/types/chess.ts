@@ -33,6 +33,8 @@ export type HistoryProps = {
   setIsKingInCheck: (kingInCheck: boolean) => void,
   setBoard: (board: (Piece | null)[][]) => void,
   setFen: (fen: string) => void,
+  halfmoveViewIndex: number,
+  setHalfmoveViewIndex: (halfmoveViewIndex: number) => void,
   setViewingOldHalfmove: (viewingOldHalfmove: boolean) => void,
   setIsGameOver: (isGameOver: boolean) => void,
   setTurn: (turn: Color) => void,
@@ -85,6 +87,7 @@ export type ChessboardProps = {
   setMoveHistory: (moveHistory: Move[]) => void,
   fenHistory: string[],
   setFenHistory: (fenHistory: string[]) => void,
+  setHalfmoveViewIndex: (halfmoveViewIndex: number) => void,
 };
 
 export type TileProps = {

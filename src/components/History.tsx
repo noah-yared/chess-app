@@ -12,7 +12,8 @@ export default function History({
   setBoard,
   setFen,
   setHighlightedTiles,
-  // setHalfmoveViewIndex,
+  halfmoveViewIndex,
+  setHalfmoveViewIndex,
   setViewingOldHalfmove,
   setTurn,
   setFirstSelectedTile,
@@ -52,21 +53,25 @@ export default function History({
     }
   }
 
-  const handleHistoryJump = async (halfmoveIndex: number) => {
-    const jumpingToLastMove = halfmoveIndex === moveHistory.length - 1;
-    // setHalfmoveViewIndex(halfmoveIndex);
-    const updatedFen = fenHistory[halfmoveIndex+1];
-    setFen(updatedFen);
-    setBoard(fenToBoard(updatedFen));
-    const { isKingInCheck, isGameOver } = await calculateFenInfo(updatedFen, new EngineAPI(new Client()));
-    setIsKingInCheck(isKingInCheck);
-    setIsGameOver(isGameOver);
-    setTurn(halfmoveIndex % 2 === 0 ? 'b' : 'w');
-    setHighlightedTiles(moveHistory[halfmoveIndex]);
-    setFirstSelectedTile(null);
-    setSecondSelectedTile(null);
-    setViewingOldHalfmove(!jumpingToLastMove);
-  }
+  useEffect(() => {
+    const handleHistoryJump = async (halfmoveIndex: number) => {
+      const jumpingToLastMove = halfmoveIndex === moveHistory.length - 1;
+      setHalfmoveViewIndex(halfmoveIndex);
+      const updatedFen = fenHistory[halfmoveIndex+1];
+      setFen(updatedFen);
+      setBoard(fenToBoard(updatedFen));
+      const { isKingInCheck, isGameOver } = await calculateFenInfo(updatedFen, new EngineAPI(new Client()));
+      setIsKingInCheck(isKingInCheck);
+      setIsGameOver(isGameOver);
+      setTurn(halfmoveIndex % 2 === 0 ? 'b' : 'w');
+      setHighlightedTiles(moveHistory[halfmoveIndex]);
+      setFirstSelectedTile(null);
+      setSecondSelectedTile(null);
+      setViewingOldHalfmove(!jumpingToLastMove);
+    }
+    handleHistoryJump(halfmoveViewIndex);
+  }, [halfmoveViewIndex]);
+
 
   const queryFenInfo: (fen: string) => FenInfo | null = (fen: string) => {
     const info = fenInfoCache[fen];
@@ -97,11 +102,11 @@ export default function History({
             const blackHalfmoveIndex = 2 * fullmoveIndex + 1;
             return <div key={fullmoveIndex} className='full-move-box'>
               <span style={{ fontSize: '20px', textEmphasis: 'Highlight' }}>{`${fullmoveIndex + 1}. `}</span>
-              <button onClick={async () => await handleHistoryJump(whiteHalfmoveIndex)}>
+              <button onClick={() => setHalfmoveViewIndex(whiteHalfmoveIndex)}>
                 {renderMove(fullmove[0], whiteHalfmoveIndex)}
               </button>
               {fullmove.length === 2 &&
-                <button onClick={async () => await handleHistoryJump(blackHalfmoveIndex)}>
+                <button onClick={() => setHalfmoveViewIndex(blackHalfmoveIndex)}>
                 {renderMove(fullmove[1], blackHalfmoveIndex)}
               </button>}
             </div>

@@ -22,6 +22,7 @@ export default function Game() {
   const [moveHistory, setMoveHistory] = useState<Move[]>([])
   const [fenHistory, setFenHistory] = useState<string[]>([STARTING_FEN]);
   const [viewingOldHalfmove, setViewingOldHalfmove] = useState(false);
+  const [halfmoveViewIndex, setHalfmoveViewIndex] = useState(-1);
 
   return (
     <div className="game-container">
@@ -49,6 +50,8 @@ export default function Game() {
             setHighlightedTiles={setHighlightedTiles}
             setFirstSelectedTile={setFirstSelectedTile}
             setSecondSelectedTile={setSecondSelectedTile}
+            halfmoveViewIndex={halfmoveViewIndex}
+            setHalfmoveViewIndex={setHalfmoveViewIndex}
           />
           <Logger
             turn={turn}
@@ -86,6 +89,7 @@ export default function Game() {
         setMoveHistory={setMoveHistory}
         fenHistory={fenHistory}
         setFenHistory={setFenHistory}
+        setHalfmoveViewIndex={setHalfmoveViewIndex}
       />
       {/* {isGameStarted && (
         <Logger

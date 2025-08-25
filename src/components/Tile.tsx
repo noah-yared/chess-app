@@ -1,12 +1,14 @@
 import type { TileProps } from "../../shared/types/chess";
 import emptyTargetIcon from '../assets/target.png';
 import occupiedTargetIcon from '../assets/occupied-target.png';
+
 import wp from '../assets/wp.svg';
 import wn from '../assets/wn.svg';
 import wb from '../assets/wb.svg';
 import wr from '../assets/wr.svg';
 import wq from '../assets/wq.svg';
 import wk from '../assets/wk.svg';
+
 import bp from '../assets/bp.svg';
 import bn from '../assets/bn.svg';
 import bb from '../assets/bb.svg';
@@ -14,7 +16,7 @@ import br from '../assets/br.svg';
 import bq from '../assets/bq.svg';
 import bk from '../assets/bk.svg';
 
-const pieceIcons: Record<string, string> = {
+const PIECE_ICONS = {
   wp, wn, wb, wr, wq, wk,
   bp, bn, bb, br, bq, bk,
 };
@@ -69,7 +71,7 @@ export default function Tile({
       onClick={handleClick}
     >
       {occupied && pieceOnTile && (
-        <img src={pieceIcons[`${pieceOnTile.color}${pieceOnTile.type}`]} width="80%" height="80%" className="piece-icon" /> 
+        <img src={PIECE_ICONS[`${pieceOnTile.color}${pieceOnTile.type}`]} width="80%" height="80%" className="piece-icon" /> 
       )}
       {isDestinationTile && !occupied && (
         <img src={emptyTargetIcon} className="target-icon" id="empty" />

@@ -1,4 +1,5 @@
 import type { Color, Difficulty, MenuProps } from '../../shared/types/chess';
+import gameStartSound from '../assets/game-start.mp3';
 
 export default function Menu({
   engineSide,
@@ -66,7 +67,7 @@ export default function Menu({
 
         <button 
           id='start-game-btn' 
-          onClick={() => setIsGameStarted(true)}
+          onClick={() => { setIsGameStarted(true); new Audio(gameStartSound).play(); }}
           disabled={isGameStarted}
           className="start-button"
         >

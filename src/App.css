@@ -13,6 +13,8 @@
   width: max(min(80vw, 80vh), 600px);
   aspect-ratio: 1;
   border: 2px solid #333;
+  position: relative;
+  contain: layout;
 }
 
 /* Individual tile styling */
@@ -26,6 +28,7 @@
   font-weight: bold;
   position: relative;
   transition: all 0.2s ease;
+  overflow: hidden;
 }
 
 /* Checked king styling with radial gradient */
@@ -58,6 +61,10 @@
   transform: scale(1.05);
 }
 
+.chessboard > div:hover .target-icon {
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
 /* Optional: Add selected state */
 .chessboard > div.selected {
   box-shadow: inset 0 0 0 3px #ffd700;
@@ -65,7 +72,12 @@
 
 .target-icon {
   position: absolute;
-  opacity: 0.75; 
+  opacity: 0.75;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10;
 }
 
 .target-icon#empty {
@@ -386,7 +398,7 @@
   
   .menu-container {
     width: 90%;
-    height: 10px;
+    height: 100%;
     max-width: 400px;
     padding: 1.5rem;
   }
@@ -422,7 +434,7 @@
 @media (max-width: 480px) {
   .menu-container {
     width: 100%;
-    height: 150px;
+    height: 100%;
     max-width: 350px;
     padding: 1rem;
   }

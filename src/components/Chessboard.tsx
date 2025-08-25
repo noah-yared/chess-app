@@ -5,7 +5,8 @@ import { processPlayerMove } from "../utils/moveValidation";
 import type { ChessboardProps, Move, MoveList } from "../../shared/types/chess";
 import { EngineAPI } from "../utils/engineApi";
 import { Client } from "../utils/client";
-import { fenToBoard } from "../utils/helpers";
+import { fenToBoard, playSound } from "../utils/helpers";
+import errorSound from '../assets/error.mp3';
 
 export default function Chessboard({
   board,
@@ -34,10 +35,12 @@ export default function Chessboard({
   setMoveHistory,
   fenHistory,
   setFenHistory,
+  setHalfmoveViewIndex,
 }: ChessboardProps) {
   const validPlayerMoves = useRef<MoveList>(INITIAL_VALID_MOVES);
 
   const applyMove = async ({ from, to, promo }: Move, newFen: string, newLegalMoves: MoveList, isKingInCheck: boolean) => {
+    await playSound({from, to, promo}, newLegalMoves, isKingInCheck, board);
     setBoard(fenToBoard(newFen));
     setFen(newFen);
     setIsCurrentKingInCheck(isKingInCheck);
@@ -54,20 +57,22 @@ export default function Chessboard({
       return;
     // make sure that its the player's turn to move (i.e. not engine's turn)
     if (firstSelectedTile && secondSelectedTile) {
-      const handleMove = async () => {
+      const handlePlayerMove = async () => {
         setHandlingMove(true);
         const result = await processPlayerMove(
           fenHistory, firstSelectedTile, secondSelectedTile, turn, validPlayerMoves);
         if (result !== null) { // invalid move
           const { move, updatedFen, newLegalMoves, isKingInCheck } = result!;
           applyMove(move, updatedFen, newLegalMoves, isKingInCheck);
+        } else {
+          new Audio(errorSound).play(); // play error sound for invalid move attempt
         }
         // reset selected tiles
         setFirstSelectedTile(null);
         setSecondSelectedTile(null);
         setHandlingMove(false);
       };
-      handleMove();
+      handlePlayerMove();
     }
   }, [
     firstSelectedTile,
@@ -85,12 +90,14 @@ export default function Chessboard({
   useEffect(() => {
     if (!isGameStarted || viewingOldHalfmove || isGameOver || turn !== engineSide || handlingMove)
       return;
+    const engineHalfmoveIndex = moveHistory.length;
     const makeEngineMove = async () => {
       setHandlingMove(true);
       const engine = new EngineAPI(new Client());
       const { response, newFen, legalMoves } = await engine.getEngineResponse(fen, difficulty);
       const isKingInCheck = await engine.isKingInCheck(newFen);
       await applyMove(response, newFen, legalMoves, isKingInCheck);
+      setHalfmoveViewIndex(engineHalfmoveIndex);
       setHandlingMove(false);
     }
     makeEngineMove();
