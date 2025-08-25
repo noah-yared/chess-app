@@ -1,5 +1,5 @@
 #root {
-  max-width: 1280px;
+  max-width: 100vw;
   margin: 0 auto;
   padding: 2rem;
   text-align: left;
@@ -10,16 +10,15 @@
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(8, 1fr);
-  flex-basis: 600px;
-  flex-shrink: 0;
-  height: 600px;
+  width: max(min(80vw, 80vh), 600px);
+  aspect-ratio: 1;
   border: 2px solid #333;
 }
 
 /* Individual tile styling */
 .chessboard > div {
-  width: 75px;
-  height: 75px;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -70,13 +69,13 @@
 }
 
 .target-icon#empty {
-  height: 25px;
-  width: 25px;
+  height: 30%;
+  width: 30%;
 }
 
 .target-icon#occupied {
-  height: 75px;
-  width: 75px;
+  height: 100%;
+  width: 100%;
 }
 
 .logo {
@@ -118,18 +117,65 @@
 /* Game Layout */
 .game-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: flex-start;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   margin: 0 auto;
-  max-width: 1200px;
-  width: 100%;
+  width: 100vw;
+  height: 100vh;
   gap: 2rem;
+}
+
+.game-info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: max(10vw, 350px);
+}
+
+.history-container {
+  background-color: #f8f9fa;
+  width: 100%;
+  height: min(300px, 50vh);
+  overflow-y: auto;
+  border: 1px solid #dee2e6;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.full-move-box {
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+}
+
+.full-move-box:last-child {
+  border-bottom: none;
+}
+
+.full-move-box button {
+  background: #000000;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.full-move-box span {
+  font-weight: bold;
+  color: #495057;
+  margin-right: 8px;
 }
 
 /* Menu Component Styles */
 .menu-container {
-  flex-basis: 400px;
+  flex-basis: 300px;
   flex-shrink: 0;
   padding: 2rem;
   background: white;
@@ -219,18 +265,18 @@
 
 /* Logger Component Styles */
 .logger-container {
-  flex-basis: 300px;
-  flex-shrink: 0;
-  padding: 1.5rem;
+  width: 100%;
+  height: 20vh;
+  min-height: fit-content;
+  padding: 15px;
   background: #3b82f6;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
-  min-height: 200px;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .logger-container h2 {
@@ -250,6 +296,14 @@
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* History viewing state */
+.logger-container .history-viewing {
+  background: rgba(255, 193, 7, 0.2);
+  border: 1px solid rgba(255, 193, 7, 0.4);
+  color: #fff3cd;
+  font-weight: 600;
 }
 
 /* Engine thinking state */
@@ -323,13 +377,73 @@
 
 /* Responsive design */
 @media (max-width: 768px) {
+  .game-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .menu-container {
+    width: 90%;
+    height: 10px;
+    max-width: 400px;
+    padding: 1.5rem;
+  }
+  
+  .game-info-container {
+    flex-direction: row;
+    width: 100%;
+    max-width: 600px;
+    gap: 1rem;
+  }
+  
+  .history-container {
+    width: 50%;
+    height: 200px;
+  }
+  
   .logger-container {
-    flex-basis: 100%;
-    margin-top: 1rem;
+    width: 50%;
+    height: 200px;
+  }
+  
+  .chessboard {
+    width: 100%;
+    max-width: 400px;
   }
   
   .logger-container h2 {
-    font-size: 1rem;
+    font-size: 0.9rem;
     padding: 0.5rem 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-container {
+    width: 100%;
+    height: 150px;
+    max-width: 350px;
+    padding: 1rem;
+  }
+  
+  .game-info-container {
+    flex-direction: column;
+    width: 90%;
+  }
+  
+  .history-container {
+    width: 90%;
+    height: 150px;
+  }
+  
+  .logger-container {
+    width: 90%;
+    height: auto;
+  }
+  
+  .chessboard {
+    width: 100%;
+    max-width: 400px;
   }
 }

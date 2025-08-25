@@ -4,7 +4,8 @@ export default function Logger({
   turn,
   engineSide,
   isCurrentKingInCheck,
-  isGameOver
+  isGameOver,
+  viewingOldHalfmove
 }: LoggerProps) {
   const isEngineToMove: boolean = turn === engineSide;
   
@@ -15,7 +16,12 @@ export default function Logger({
         Game has ended!
       </h2>
     )}
-    {!isGameOver && (
+    {!isGameOver && viewingOldHalfmove && (
+      <h2 className={`status-message history-viewing`}>
+        {"Viewing history 📜"}<br/>{"Click last move to continue ⏩"}
+      </h2>
+    )}
+    {!isGameOver && !viewingOldHalfmove && (
       <h2 className={`status-message ${
         isEngineToMove ? "engine-thinking" :
                          "player-turn"

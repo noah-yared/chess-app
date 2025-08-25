@@ -20,13 +20,33 @@ export type Move = {
   promo?: Promotion,
 }
 
+export type GameStatus = {
+  isKingInCheck: boolean,
+  isGameOver: boolean,
+}
+
 export type MoveList = Map<Square, Array<{to: Square, promoting: boolean}>>;
+
+export type HistoryProps = {
+  moveHistory: Move[],
+  fenHistory: string[],
+  setIsKingInCheck: (kingInCheck: boolean) => void,
+  setBoard: (board: (Piece | null)[][]) => void,
+  setFen: (fen: string) => void,
+  setViewingOldHalfmove: (viewingOldHalfmove: boolean) => void,
+  setIsGameOver: (isGameOver: boolean) => void,
+  setTurn: (turn: Color) => void,
+  setHighlightedTiles: (highlightedSquares: {from: Square, to: Square} | null) => void,
+  setFirstSelectedTile: (tile: Square | null) => void,
+  setSecondSelectedTile: (tile: Square | null) => void,
+}
 
 export type LoggerProps = {
   turn: Color,
   engineSide: Color,
   isCurrentKingInCheck: boolean,
-  isGameOver: boolean
+  isGameOver: boolean,
+  viewingOldHalfmove: boolean
 };
 
 export type MenuProps = {
@@ -39,10 +59,10 @@ export type MenuProps = {
 }
 
 export type ChessboardProps = {
-  fen: string,
-  setFen: (fen: string) => void,
   board: (Piece | null)[][],
   setBoard: (board: (Piece | null)[][]) => void,
+  fen: string,
+  setFen: (fen: string) => void,
   turn: Color,
   setTurn: (turn: Color) => void,
   firstSelectedTile: Square | null,
@@ -59,7 +79,12 @@ export type ChessboardProps = {
   setIsGameOver: (isGameOver: boolean) => void,
   engineSide: Color,
   isGameStarted: boolean,
-  difficulty: Difficulty
+  difficulty: Difficulty,
+  viewingOldHalfmove: boolean,
+  moveHistory: Move[],
+  setMoveHistory: (moveHistory: Move[]) => void,
+  fenHistory: string[],
+  setFenHistory: (fenHistory: string[]) => void,
 };
 
 export type TileProps = {
@@ -77,4 +102,5 @@ export type TileProps = {
   isGameOver: boolean,
   isDestinationTile: boolean,
   engineSide: Color,
+  viewingOldHalfmove: boolean,
 };

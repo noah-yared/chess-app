@@ -1,17 +1,17 @@
 import { useEffect, useRef } from "react";
 import Tile from "./Tile";
 import { RANKS, FILES, SQUARE_COLORS, INITIAL_VALID_MOVES } from "../../shared/constants/chess";
-import { handlePlayerMove } from "../utils/moveValidation";
-import type { ChessboardProps, MoveList } from "../../shared/types/chess";
+import { processPlayerMove } from "../utils/moveValidation";
+import type { ChessboardProps, Move, MoveList } from "../../shared/types/chess";
 import { EngineAPI } from "../utils/engineApi";
 import { Client } from "../utils/client";
 import { fenToBoard } from "../utils/helpers";
 
 export default function Chessboard({
-  fen,
-  setFen,
   board,
   setBoard,
+  fen,
+  setFen,
   turn,
   setTurn,
   firstSelectedTile,
@@ -28,56 +28,71 @@ export default function Chessboard({
   setIsGameOver,
   isGameStarted,
   engineSide,
-  difficulty
+  difficulty,
+  viewingOldHalfmove,
+  moveHistory,
+  setMoveHistory,
+  fenHistory,
+  setFenHistory,
 }: ChessboardProps) {
   const validPlayerMoves = useRef<MoveList>(INITIAL_VALID_MOVES);
+
+  const applyMove = async ({ from, to, promo }: Move, newFen: string, newLegalMoves: MoveList, isKingInCheck: boolean) => {
+    setBoard(fenToBoard(newFen));
+    setFen(newFen);
+    setIsCurrentKingInCheck(isKingInCheck);
+    setFenHistory([...fenHistory, newFen]);
+    setMoveHistory([...moveHistory, {from, to, promo}]);
+    setTurn(turn === 'w' ? 'b' : 'w');
+    setIsGameOver(newLegalMoves.size === 0);
+    setHighlightedTiles({from, to});
+    validPlayerMoves.current = newLegalMoves;
+  }
+
   useEffect(() => {
-    if (!isGameStarted || isGameOver || turn === engineSide || handlingMove)
+    if (!isGameStarted || viewingOldHalfmove || isGameOver || turn === engineSide || handlingMove)
       return;
     // make sure that its the player's turn to move (i.e. not engine's turn)
     if (firstSelectedTile && secondSelectedTile) {
-      setHandlingMove(true);
-      handlePlayerMove(fen, setFen, setBoard, firstSelectedTile, secondSelectedTile,
-        setHighlightedTiles, setIsCurrentKingInCheck, turn, setTurn, setIsGameOver,
-        validPlayerMoves);
-      // reset selected tiles
-      setFirstSelectedTile(null);
-      setSecondSelectedTile(null);
-      setHandlingMove(false);
+      const handleMove = async () => {
+        setHandlingMove(true);
+        const result = await processPlayerMove(
+          fenHistory, firstSelectedTile, secondSelectedTile, turn, validPlayerMoves);
+        if (result !== null) { // invalid move
+          const { move, updatedFen, newLegalMoves, isKingInCheck } = result!;
+          applyMove(move, updatedFen, newLegalMoves, isKingInCheck);
+        }
+        // reset selected tiles
+        setFirstSelectedTile(null);
+        setSecondSelectedTile(null);
+        setHandlingMove(false);
+      };
+      handleMove();
     }
   }, [
     firstSelectedTile,
     secondSelectedTile,
     turn,
-    engineSide,
     fen,
+    engineSide,
     isGameOver,
-    setFen,
-    setBoard,
     setTurn,
     setFirstSelectedTile,
     setSecondSelectedTile,
-    setIsGameOver
+    setIsGameOver,
   ]);
 
   useEffect(() => {
-    if (!isGameStarted || isGameOver || turn !== engineSide || handlingMove)
+    if (!isGameStarted || viewingOldHalfmove || isGameOver || turn !== engineSide || handlingMove)
       return;
-
     const makeEngineMove = async () => {
       setHandlingMove(true);
       const engine = new EngineAPI(new Client());
       const { response, newFen, legalMoves } = await engine.getEngineResponse(fen, difficulty);
-      setIsCurrentKingInCheck(await engine.isKingInCheck(newFen));
-      setFen(newFen);
-      setBoard(fenToBoard(newFen));
-      setTurn(engineSide === 'w' ? 'b' : 'w');
-      setIsGameOver(legalMoves.size === 0);
-      setHighlightedTiles(response);
-      validPlayerMoves.current = legalMoves;
+      const isKingInCheck = await engine.isKingInCheck(newFen);
+      await applyMove(response, newFen, legalMoves, isKingInCheck);
       setHandlingMove(false);
     }
-
     makeEngineMove();
   }, [
     turn,
@@ -90,7 +105,6 @@ export default function Chessboard({
     setIsGameOver,
     isGameStarted
   ]);
-
 
   return (
     <div className='chessboard'>
@@ -117,7 +131,8 @@ export default function Chessboard({
                        isGameStarted={isGameStarted}
                        isGameOver={isGameOver}
                        isDestinationTile={isDestinationTile}
-                       engineSide={engineSide} />;
+                       engineSide={engineSide}
+                       viewingOldHalfmove={viewingOldHalfmove} />
         });
       })}
     </div>

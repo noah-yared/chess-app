@@ -33,12 +33,13 @@ export default function Tile({
   isGameOver,
   isDestinationTile,
   isGameStarted,
-  engineSide
+  engineSide,
+  viewingOldHalfmove
 }: TileProps) {
 
   const handleClick: () => void = () => {
     console.log('clicked square: ', notation);
-    if (!isGameStarted || isGameOver || turn === engineSide) {
+    if (!isGameStarted || viewingOldHalfmove || isGameOver || turn === engineSide) {
       return;
     }
     if (firstSelectedTile === notation) {
@@ -60,8 +61,6 @@ export default function Tile({
   };
 
   const isCheckedKing = isCurrentKingInCheck && pieceOnTile?.type === 'k' && pieceOnTile?.color === turn;
-  if (isCheckedKing)
-    console.warn("handling checked king, should be painting checked kings square red");
   
   return (
     <div 
@@ -70,7 +69,7 @@ export default function Tile({
       onClick={handleClick}
     >
       {occupied && pieceOnTile && (
-        <img src={pieceIcons[`${pieceOnTile.color}${pieceOnTile.type}`]} width={60} height={60} className="piece-icon" /> 
+        <img src={pieceIcons[`${pieceOnTile.color}${pieceOnTile.type}`]} width="80%" height="80%" className="piece-icon" /> 
       )}
       {isDestinationTile && !occupied && (
         <img src={emptyTargetIcon} className="target-icon" id="empty" />
