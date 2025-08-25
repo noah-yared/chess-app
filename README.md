@@ -70,11 +70,11 @@ npm run setup:fast
 
 4. Build and start the production server and frontend:
 ```bash
-npm run build:full
-npm run start:full
+npm run build
+npm run start
 ```
 
-The application url should be printed to the console after running `npm run start:full`, likely defaults to `http://localhost:4173`.
+The application url should be printed to the console after running `npm run start`, likely defaults to `http://localhost:4173`.
 
 ## API Endpoints
 
