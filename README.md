@@ -4,10 +4,13 @@ A modern web-based chess interface built with React, TypeScript, and Vite, featu
 
 ## Features
 
-- **Interactive Chessboard**: Click to move pieces with highlights for all valid moves
+- **Interactive Chessboard**: Click to move pieces with automatic legal move validation and highlighting
 - **Custom Chess Engine**: Fast custom C++ engine backend (see [here](https://github.com/noah-yared/chess-engine/blob/main/README.md) for more details)
-- **Instant Move Feedback**: Play against the engine with quick server response times
-- **Legal Move Validation**: Automatic legal move detection and highlighting
+- **Game Menu**: Choose your side (White/Black/Random) and difficulty level before starting
+- **Move History**: Browse through previous moves with interactive history navigation
+- **Game State Persistence**: Automatic game state saving and restoration
+- **Multiple Difficulty Levels**: From Beginner to Master
+- **Sound Effects**: Audio feedback for game events (move sounds, check, game start/end)
 - **Modern UI**: Clean, responsive interface with clear chess piece graphics
 
 ## Project Structure
@@ -21,7 +24,14 @@ chess_engine_ui/
 │   └── bench/             # Performance benchmarks
 ├── src/                   # React frontend
 │   ├── components/        # React components
+│   │   ├── Game.tsx       # Main game logic
+│   │   ├── Chessboard.tsx # Interactive chessboard
+│   │   ├── Menu.tsx       # Game setup menu
+│   │   ├── History.tsx    # Move history component
+│   │   ├── Logger.tsx     # Game status logger
+│   │   └── Tile.tsx       # Individual board tiles
 │   ├── utils/             # Utility functions
+│   └── assets/            # Images and sound effects
 ├── server/                # Node.js backend
 ├── shared/                # Shared constants and types
 │   ├── constants/         # Shared game constants
@@ -68,18 +78,10 @@ npm run setup # may take ~1 minute as engine tests are run
 npm run setup:fast
 ```
 
-4. Build and start the production server and frontend:
+3. Build and start the production server and frontend:
 ```bash
 npm run build
 npm run start
 ```
 
 The application url should be printed to the console after running `npm run start`, likely defaults to `http://localhost:4173`.
-
-## API Endpoints
-
-The backend provides the following endpoints:
-
-- `POST /update-fen` - Update board position after a move
-- `POST /engine-move` - Get engine's response move
-- `POST /legal-moves` - Get all legal moves for current position
