@@ -21,7 +21,11 @@ export class Client {
       throw new Error(`${response.status}: HTTP request to ${endpoint} failed!`);
     }
 
-    return await response.json();
+    try {
+      return await response.json();
+    } catch {
+      throw new Error(`Failed to parse response ${response} from ${endpoint} as JSON!`);
+    }
   }
 
   public async get<T>(endpoint: string, body?: unknown): Promise<T> {

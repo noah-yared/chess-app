@@ -38,6 +38,10 @@ export const STARTING_BOARD: (Piece | null)[][] = [
   ],
 ];
 
+export const HEARTBEAT_INTERVAL: number = 5000; // 5 seconds
+export const HEARTBEAT_TIMEOUT: number = 10000; // 10 seconds
+export const RESTORE_INTERVAL: number = 1000; // 1 second
+
 // Board dimensions
 export const BOARD_SIZE = 8;
 

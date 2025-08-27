@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import Tile from "./Tile";
-import { RANKS, FILES, SQUARE_COLORS, INITIAL_VALID_MOVES } from "../../shared/constants/chess";
+import { RANKS, FILES, SQUARE_COLORS } from "../../shared/constants/chess";
 import { processPlayerMove } from "../utils/moveValidation";
 import type { ChessboardProps, Move, MoveList } from "../../shared/types/chess";
 import { EngineAPI } from "../utils/engineApi";
@@ -36,9 +36,8 @@ export default function Chessboard({
   fenHistory,
   setFenHistory,
   setHalfmoveViewIndex,
+  validPlayerMoves,
 }: ChessboardProps) {
-  const validPlayerMoves = useRef<MoveList>(INITIAL_VALID_MOVES);
-
   const applyMove = async ({ from, to, promo }: Move, newFen: string, newLegalMoves: MoveList, isKingInCheck: boolean) => {
     await playSound({from, to, promo}, newLegalMoves, isKingInCheck, board);
     setBoard(fenToBoard(newFen));
@@ -59,12 +58,15 @@ export default function Chessboard({
     if (firstSelectedTile && secondSelectedTile) {
       const handlePlayerMove = async () => {
         setHandlingMove(true);
+        console.log('handling player move...');
         const result = await processPlayerMove(
-          fenHistory, firstSelectedTile, secondSelectedTile, turn, validPlayerMoves);
-        if (result !== null) { // invalid move
+          firstSelectedTile, secondSelectedTile, turn, validPlayerMoves);
+        console.log('player move result', result);
+        if (result !== null) { // valid move
           const { move, updatedFen, newLegalMoves, isKingInCheck } = result!;
-          applyMove(move, updatedFen, newLegalMoves, isKingInCheck);
-        } else {
+          await applyMove(move, updatedFen, newLegalMoves, isKingInCheck);
+          console.log('player move applied');
+        } else { // invalid move
           new Audio(errorSound).play(); // play error sound for invalid move attempt
         }
         // reset selected tiles
@@ -94,8 +96,8 @@ export default function Chessboard({
     const makeEngineMove = async () => {
       setHandlingMove(true);
       const engine = new EngineAPI(new Client());
-      const { response, newFen, legalMoves } = await engine.getEngineResponse(fen, difficulty);
-      const isKingInCheck = await engine.isKingInCheck(newFen);
+      const { response, newFen, legalMoves } = await engine.getEngineResponse(difficulty);
+      const isKingInCheck = await engine.isKingInCheck();
       await applyMove(response, newFen, legalMoves, isKingInCheck);
       setHalfmoveViewIndex(engineHalfmoveIndex);
       setHandlingMove(false);

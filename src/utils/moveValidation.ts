@@ -17,7 +17,6 @@ async function handlePromotion(from: Square, to: Square, turn: Color): Promise<P
 }
 
 export async function processPlayerMove(
-  fenHistory: string[],
   from: Square,
   to: Square,
   turn: Color,
@@ -34,12 +33,10 @@ export async function processPlayerMove(
     ? await handlePromotion(from, to, turn)
     : undefined;
 
-  const oldFen = fenHistory[fenHistory.length - 1];
   const engine = new EngineAPI(new Client());
-  const updatedFen = await engine.updateFen(oldFen, { from, to, promo });
-  const [newLegalMoves, isKingInCheck] = await Promise.all([
-    engine.getLegalMoves(updatedFen),
-    engine.isKingInCheck(updatedFen),
-  ]);
+  const updatedFen = await engine.updateFen({ from, to, promo });
+  const newLegalMoves = await engine.getLegalMoves();
+  const isKingInCheck = await engine.isKingInCheck();
+
   return { move: { from, to, promo }, updatedFen, newLegalMoves, isKingInCheck };
 }

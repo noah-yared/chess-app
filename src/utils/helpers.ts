@@ -1,5 +1,7 @@
-import type { File, Move, Piece, Rank, Square, GameStatus, MoveList } from "../../shared/types/chess";
-import { BOARD_SIZE } from "../../shared/constants/chess";
+import type { File, Move, Piece, Rank, Square, GameStatus, MoveList, Color, Difficulty } from "../../shared/types/chess";
+import { BOARD_SIZE, STARTING_BOARD, STARTING_FEN, INITIAL_VALID_MOVES } from "../../shared/constants/chess";
+import { EngineAPI } from "./engineApi"
+import { Client } from "./client";
 
 import quietMoveSound from '../assets/quiet-move.mp3';
 import captureMoveSound from '../assets/capture-move.mp3';
@@ -47,9 +49,6 @@ const isCastle = (move: Move, board: (Piece | null)[][]) => {
 
 export async function playSound(move: Move, newLegalMoves: MoveList, isKingInCheck: boolean, board: (Piece | null)[][]): Promise<void> {
   const { to, promo } = move;
-  if (isCastle(move, board))
-    return await new Audio(castleSound).play();
-
   const isCapture = existsPieceOnSquare(board, to);
   const isPromotion = promo !== null;
   const isGameOver = newLegalMoves.size === 0;
@@ -61,6 +60,8 @@ export async function playSound(move: Move, newLegalMoves: MoveList, isKingInChe
       sounds.push(new Audio(checkSound).play());
   } else if (isKingInCheck) {
     sounds.push(new Audio(checkSound).play());
+  } else if (isCastle(move, board)) {
+    sounds.push(new Audio(castleSound).play());
   } else if (isPromotion) {
     sounds.push(new Audio(promotionSound).play());
   } else if (isCapture) {
@@ -82,12 +83,13 @@ export function notateMove(move: Move, board: (Piece | null)[][], gameStatus: Ga
   const fromPiece = getPieceFromSquare(board, from);
   const existsToPiece = existsPieceOnSquare(board, to);
   const pieceType = fromPiece.type === 'p' ? '' : toUpperIfWhite(fromPiece.type, fromPiece.color === 'w');
+  const file = fromPiece.type === 'p' && existsToPiece ? from[0] : '';
   const promotion = promo ? toUpperIfWhite(promo, fromPiece.color === 'w') : '';
   const capture = existsToPiece ? 'x' : '';
   const check = !isGameOver && isKingInCheck ? '+' : '';
   const checkmate = isGameOver && isKingInCheck ? '#' : '';
   const stalemate = isGameOver && !isKingInCheck ? '$' : '';
-  return `${pieceType}${capture}${to}${promotion}${check}${checkmate}${stalemate}`;
+  return `${pieceType}${file}${capture}${to}${promotion}${check}${checkmate}${stalemate}`;
 }
 
 export function fenToBoard(fen: string): (Piece | null)[][] {
@@ -110,4 +112,139 @@ export function fenToBoard(fen: string): (Piece | null)[][] {
   }
 
   return board;
+}
+
+export function sendHeartbeat() {
+  new EngineAPI(new Client()).heartbeat();
+}
+
+export async function hasClientTimedOut() {
+  return await new EngineAPI(new Client()).didClientTimeOut();
+}
+
+export function restoreGame(
+  setBoard: (board: (Piece | null)[][]) => void,
+  setFen: (fen: string) => void,
+  setTurn: (turn: Color) => void,
+  setFirstSelectedTile: (firstSelectedTile: Square | null) => void,
+  setSecondSelectedTile: (secondSelectedTile: Square | null) => void,
+  setHighlightedTiles: (highlightedTiles: {from: Square, to: Square} | null) => void,
+  setHandlingMove: (handlingMove: boolean) => void,
+  setIsCurrentKingInCheck: (isCurrentKingInCheck: boolean) => void,
+  setEngineSide: (engineSide: Color) => void,
+  setDifficulty: (difficulty: Difficulty) => void,
+  setIsGameStarted: (isGameStarted: boolean) => void,
+  setIsGameOver: (isGameOver: boolean) => void,
+  setMoveHistory: (moveHistory: Move[]) => void,
+  setFenHistory: (fenHistory: string[]) => void,
+  setViewingOldHalfmove: (viewingOldHalfmove: boolean) => void,
+  setHalfmoveViewIndex: (halfmoveViewIndex: number) => void,
+  validPlayerMoves: React.RefObject<MoveList>
+) {
+  const game = localStorage.getItem('game');
+
+  if (!game)
+    return;
+
+  const gameData = JSON.parse(game);
+
+  setBoard(gameData.board);
+  setFen(gameData.fen);
+  setTurn(gameData.turn);
+  setFirstSelectedTile(null);
+  setSecondSelectedTile(null);
+  setHighlightedTiles(gameData.highlightedTiles);
+  setHandlingMove(false);
+  setIsCurrentKingInCheck(gameData.isCurrentKingInCheck);
+  setEngineSide(gameData.engineSide);
+  setDifficulty(gameData.difficulty);
+  setIsGameStarted(gameData.isGameStarted);
+  setIsGameOver(gameData.isGameOver);
+  setMoveHistory(gameData.moveHistory);
+  setFenHistory(gameData.fenHistory);
+  setViewingOldHalfmove(gameData.viewingOldHalfmove);
+  setHalfmoveViewIndex(gameData.halfmoveViewIndex);
+  validPlayerMoves.current = new Map(Object.entries(gameData.validPlayerMoves) as [Square, Array<{to: Square, promoting: boolean}>][]);
+}
+
+export function saveGame(
+  board: (Piece | null)[][],
+  fen: string,
+  turn: Color,
+  firstSelectedTile: Square | null,
+  secondSelectedTile: Square | null,
+  highlightedTiles: {from: Square, to: Square} | null,
+  handlingMove: boolean,
+  isCurrentKingInCheck: boolean,
+  engineSide: Color,
+  difficulty: Difficulty,
+  isGameStarted: boolean,
+  isGameOver: boolean,
+  moveHistory: Move[],
+  fenHistory: string[],
+  viewingOldHalfmove: boolean,
+  halfmoveViewIndex: number,
+  validPlayerMoves: React.RefObject<MoveList>
+) {
+  localStorage.setItem('game', JSON.stringify({
+    board,
+    fen,
+    turn,
+    firstSelectedTile,
+    secondSelectedTile,
+    highlightedTiles,
+    handlingMove,
+    isCurrentKingInCheck,
+    engineSide,
+    difficulty,
+    isGameStarted,
+    isGameOver,
+    moveHistory,
+    fenHistory,
+    viewingOldHalfmove,
+    halfmoveViewIndex,
+    validPlayerMoves: Object.fromEntries(validPlayerMoves.current.entries()) as Record<Square, Array<{to: Square, promoting: boolean}>>,
+  }));
+}
+
+export function resetGame(
+  setBoard: (board: (Piece | null)[][]) => void,
+  setFen: (fen: string) => void,
+  setTurn: (turn: Color) => void,
+  setFirstSelectedTile: (firstSelectedTile: Square | null) => void,
+  setSecondSelectedTile: (secondSelectedTile: Square | null) => void,
+  setHighlightedTiles: (highlightedTiles: {from: Square, to: Square} | null) => void,
+  setHandlingMove: (handlingMove: boolean) => void,
+  setIsCurrentKingInCheck: (isCurrentKingInCheck: boolean) => void,
+  setEngineSide: (engineSide: Color) => void,
+  setDifficulty: (difficulty: Difficulty) => void,
+  setIsGameStarted: (isGameStarted: boolean) => void,
+  setIsGameOver: (isGameOver: boolean) => void,
+  setMoveHistory: (moveHistory: Move[]) => void,
+  setFenHistory: (fenHistory: string[]) => void,
+  setViewingOldHalfmove: (viewingOldHalfmove: boolean) => void,
+  setHalfmoveViewIndex: (halfmoveViewIndex: number) => void,
+  validPlayerMoves: React.RefObject<MoveList>
+) {
+  setBoard(STARTING_BOARD);
+  setFen(STARTING_FEN);
+  setTurn('w');
+  setFirstSelectedTile(null);
+  setSecondSelectedTile(null);
+  setHighlightedTiles(null);
+  setHandlingMove(false);
+  setIsCurrentKingInCheck(false);
+  setEngineSide('b');
+  setDifficulty('intermediate');
+  setIsGameStarted(false);
+  setIsGameOver(false);
+  setMoveHistory([]);
+  setFenHistory([STARTING_FEN]);
+  setViewingOldHalfmove(false);
+  setHalfmoveViewIndex(-1);
+  validPlayerMoves.current = INITIAL_VALID_MOVES;
+  new EngineAPI(new Client()).reset();  
+
+  // clear local storage, resetting game state
+  localStorage.clear();
 }

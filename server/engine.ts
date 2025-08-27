@@ -1,12 +1,60 @@
 import * as fs from 'node:fs';
 import { join } from 'node:path';
 import { cwd } from 'node:process';
-import { strict as assert } from 'node:assert';
-import { spawnSync } from 'child_process';
+import { spawn, type ChildProcessWithoutNullStreams } from 'child_process';
 import type { Move, MoveList, Promotion, Square } from '../shared/types/chess';
+
+class Deferred<T> {
+  public readonly promise: Promise<T>;
+  public resolve!: (value: T) => void;
+  public reject!: (reason?: unknown) => void;
+
+  constructor() {
+    this.promise = new Promise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    });
+  }
+}
 
 export class Engine {
   private static readonly engineBinaryPath: string = Engine.getEngineBinaryPath();
+  private readonly engineProcess: ChildProcessWithoutNullStreams;
+  
+  // store output for later command that is to be processed
+  private pendingOutput: string = "";
+
+  private readonly outputQueue: Array<Deferred<string>> = [];
+
+  constructor() {
+    this.engineProcess = spawn(Engine.engineBinaryPath, ['--app-mode']);
+    this.engineProcess.stdout.setEncoding('utf-8');
+    this.engineProcess.stderr.setEncoding('utf-8');
+    this.engineProcess.stdout.on('data', (data: string) => {
+      const emptyLine = "\n\n";
+
+      let fullOutput = this.pendingOutput + data;
+      let outputEnd = fullOutput.indexOf(emptyLine);
+
+      while (outputEnd !== -1) {
+        const invokationOutput = fullOutput.substring(0, outputEnd + emptyLine.length);
+        this.outputQueue.shift()!.resolve(invokationOutput);
+        fullOutput = fullOutput.substring(outputEnd + emptyLine.length);
+        outputEnd = fullOutput.indexOf(emptyLine);
+      }
+
+      // store remaining output for later processing
+      this.pendingOutput = fullOutput;
+
+      console.log('remaining output queue size:', this.outputQueue.length);
+    });
+    this.engineProcess.stderr.on('data', (data: string) => {
+      console.log('got a chunk of stderr data:\n' + data);
+    });
+    this.engineProcess.on('close', (exitCode: number) => {
+      console.log('engine process closed with exit code', exitCode);
+    });
+  }
 
   private static getEngineBinaryPath(): string {
     const engineConfigPath: string = join(cwd(), 'engine', 'engine_config.json');
@@ -15,20 +63,40 @@ export class Engine {
     return config.enginePath!; // should not be undefined
   }
 
-  private static invokeEngine(...args: string[]): string {
-    const output = spawnSync(Engine.engineBinaryPath, args, { encoding: "utf-8" });
+  private async invokeEngine(input: string, expectOutput: boolean = true): Promise<string> {
+    const writeResult = this.engineProcess.stdin.write(input.trim() + '\n');
 
-    // ensure 0 exit status
-    assert(
-      output.status === 0,
-      "Some error occurred or execution was interrupted during invocation of engine."
-    );
+    const drainProcessBuffer = (() => new Promise<void>((resolve, reject) => {
+      try {
+        this.engineProcess.on('drain', resolve);
+      } catch {
+        reject('failed to drain buffer');
+      }
+    }));
 
-    return output.stdout;
+    if (!writeResult) {
+      await drainProcessBuffer();
+      return await this.invokeEngine(input);
+    } else {
+      console.log('successfully wrote', input.trim(), 'to engine process stdin');
+    }
+
+    if (!expectOutput) {
+      return '';
+    }
+
+    const output = new Deferred<string>();
+    this.outputQueue.push(output);
+
+    return await output.promise;
   }
 
-  public static computeLegalMoves(fen: string): MoveList {
-    const result = Engine.invokeEngine("--legal-moves", fen);
+  public async setPosition(fen: string): Promise<void> {
+    await this.invokeEngine(`set-position,${fen}`, false);
+  }
+
+  public async computeLegalMoves(fen?: string): Promise<MoveList> {
+    const result = await this.invokeEngine(`legal-moves${fen ? `,${fen}` : ''}`);
     const matches = result.matchAll(/(?<from>[a-h][1-8])(?<to>[a-h][1-8])(?<promo>[nrbq]?)/g);
     const seen = new Set<string>();
     const moves: MoveList = new Map();
@@ -48,8 +116,9 @@ export class Engine {
     return moves;
   }
 
-  public static computeEngineMove(fen: string, depth: number): Move {
-    const result = Engine.invokeEngine("--find-best", fen , "-d", `${depth}`);
+  public async computeEngineMove(depth: number, easyMode: boolean): Promise<Move> {
+    console.log(`computing engine move with depth ${depth} and easy mode ${easyMode}`);
+    const result = await this.invokeEngine(`find-best,${depth},${easyMode ? 'true' : 'false'}`);
     const match = result.match(/(?<from>[a-h][1-8])(?<to>[a-h][1-8])(?<promo>[nrbq]?)/);
     const { from, to, promo } = match!.groups!;
     if (promo.length === 0)
@@ -57,15 +126,19 @@ export class Engine {
     return { from: from as Square, to: to as Square, promo: promo as Promotion } as const;
   }
 
-  public static computeKingInCheck(fen: string): boolean {
-    const result = Engine.invokeEngine("--king-in-check", fen);
+  public async computeKingInCheck(fen?: string): Promise<boolean> {
+    const result = await this.invokeEngine(`king-in-check${fen ? `,${fen}` : ''}`);
     const match = result.match(/(true|false)/);
     return match![0] === 'true';
   }
 
-  public static computeUpdatedFen(fen: string, move: Move): string {
+  public async computeUpdatedFen(move: Move, fen?: string): Promise<string> {
     const uciNotation: string = `${move.from}${move.to}${move.promo ? move.promo : ''}`;
-    return Engine.invokeEngine("--make-move", fen, uciNotation).trim();
+    return (await this.invokeEngine(`make-move,${uciNotation}${fen ? `,${fen}` : ''}`)).trim();
+  }
+
+  public async computeCurrentFen(): Promise<string> {
+    return (await this.invokeEngine("current-fen")).trim();
   }
 
 }

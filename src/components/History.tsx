@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { fenToBoard, notateMove } from '../utils/helpers';
 import { Client } from '../utils/client'
 import { EngineAPI } from '../utils/engineApi';
@@ -22,25 +22,34 @@ export default function History({
   type FenInfo = { isKingInCheck: boolean, isGameOver: boolean };
   const [fenInfoCache, setFenInfoCache] = useState<Record<string, FenInfo>>({});
 
-  useEffect(() => {
-    console.log('updating fenInfoCache...');
-    if (fenHistory.length === Object.keys(fenInfoCache).length) {
-      return // cache is complete
-    }
+  const fenInfoCacheRef = useRef(fenInfoCache);
+  const fenHistoryRef = useRef(fenHistory);
 
-    const fillCache = async () => {
-      const engine = new EngineAPI(new Client());
-      for (const fen of fenHistory) {
-        if (!fenInfoCache[fen]) {
-          setFenInfoCache({ ...fenInfoCache, [fen]: await calculateFenInfo(fen, engine) });
-        }
+  // keep refs in sync with state
+  useEffect(() => {
+    fenHistoryRef.current = fenHistory;
+    fenInfoCacheRef.current = fenInfoCache;
+  }, [fenHistory, fenInfoCache]);
+
+  useEffect(() => {
+    const updateCacheInterval = setInterval(() => {
+      const missingFens = fenHistoryRef.current.filter(fen => !fenInfoCacheRef.current[fen]);
+      if (missingFens.length === 0) {
+        return // cache is up to date
       }
-    };
-    fillCache();
-  }, [
-    moveHistory,
-    fenHistory
-  ]);
+
+      const fillCache = async () => {
+        const engine = new EngineAPI(new Client());
+        for (const fen of missingFens) {
+          if (!fenInfoCacheRef.current[fen]) {
+            setFenInfoCache({ ...fenInfoCacheRef.current, [fen]: await calculateFenInfo(fen, engine) });
+          }
+        }
+      };
+      fillCache();
+    }, 300);
+    return () => clearInterval(updateCacheInterval);
+  }, []);
 
   const calculateFenInfo = async (fen: string, engine: EngineAPI) => {
     const [isKingInCheck, legalMoves] = await Promise.all([

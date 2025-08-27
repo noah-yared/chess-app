@@ -1,13 +1,52 @@
 import type { LoggerProps } from '../../shared/types/chess';
+import { resetGame } from '../utils/helpers';
 
 export default function Logger({
   turn,
   engineSide,
   isCurrentKingInCheck,
   isGameOver,
-  viewingOldHalfmove
+  viewingOldHalfmove,
+  /* setters for resetting game */
+  setBoard,
+  setFen,
+  setTurn,
+  setFirstSelectedTile,
+  setSecondSelectedTile,
+  setHighlightedTiles,
+  setHandlingMove,
+  setIsCurrentKingInCheck,
+  setEngineSide,
+  setDifficulty,
+  setIsGameStarted,
+  setIsGameOver,
+  setMoveHistory,
+  setFenHistory,
+  setViewingOldHalfmove,
+  setHalfmoveViewIndex,
+  validPlayerMoves,
 }: LoggerProps) {
   const isEngineToMove: boolean = turn === engineSide;
+  
+  const reset = () => resetGame(
+    setBoard,
+    setFen,
+    setTurn,
+    setFirstSelectedTile,
+    setSecondSelectedTile,
+    setHighlightedTiles,
+    setHandlingMove,
+    setIsCurrentKingInCheck,
+    setEngineSide,
+    setDifficulty,
+    setIsGameStarted,
+    setIsGameOver,
+    setMoveHistory,
+    setFenHistory,
+    setViewingOldHalfmove,
+    setHalfmoveViewIndex,
+    validPlayerMoves,
+  );
   
   const turnStatusElement = (
     <>
@@ -56,6 +95,7 @@ export default function Logger({
     <div className='logger-container'>
       {turnStatusElement}
       {gameStatusElement}
+      <button onClick={reset}>{isGameOver ? "Play new game" : "Restart game"}</button>
     </div>
   );
 }

@@ -1,3 +1,5 @@
+import type { RefObject } from 'react';
+
 export type PieceType = 'p' | 'r' | 'n' | 'b' | 'q' | 'k';
 export type Color = 'w' | 'b';
 
@@ -49,6 +51,23 @@ export type LoggerProps = {
   isCurrentKingInCheck: boolean,
   isGameOver: boolean,
   viewingOldHalfmove: boolean
+  setBoard: (board: (Piece | null)[][]) => void,
+  setFen: (fen: string) => void,
+  setTurn: (turn: Color) => void,
+  setFirstSelectedTile: (tile: Square | null) => void,
+  setSecondSelectedTile: (tile: Square | null) => void,
+  setHighlightedTiles: (highlightedSquares: {from: Square, to: Square} | null) => void,
+  setHandlingMove: (handlingMove: boolean) => void,
+  setIsCurrentKingInCheck: (isCurrentKingInCheck: boolean) => void,
+  setEngineSide: (side: Color) => void,
+  setDifficulty: (difficulty: Difficulty) => void,
+  setIsGameStarted: (isGameStarted: boolean) => void,
+  setIsGameOver: (isGameOver: boolean) => void,
+  setMoveHistory: (moveHistory: Move[]) => void,
+  setFenHistory: (fenHistory: string[]) => void,
+  setViewingOldHalfmove: (viewingOldHalfmove: boolean) => void,
+  setHalfmoveViewIndex: (halfmoveViewIndex: number) => void,
+  validPlayerMoves: RefObject<MoveList>,
 };
 
 export type MenuProps = {
@@ -88,6 +107,7 @@ export type ChessboardProps = {
   fenHistory: string[],
   setFenHistory: (fenHistory: string[]) => void,
   setHalfmoveViewIndex: (halfmoveViewIndex: number) => void,
+  validPlayerMoves: RefObject<MoveList>,
 };
 
 export type TileProps = {
