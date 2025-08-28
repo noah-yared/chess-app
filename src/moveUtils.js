@@ -14,6 +14,8 @@ const makeMove = (startTile, endTile, result) => {
 
 const getMoveNotation = (playerMoveInfo, result) => {
   let notatedMove;
+  const move = playerMoveInfo.move ?? playerMoveInfo;
+
   if (result["castled"]) {
     notatedMove = move[0][1] > move[1][1] ? 'o-o-o' : 'o-o';
     return getPlayerTurn() === "white" ? notatedMove.toUpperCase() : notatedMove; 
