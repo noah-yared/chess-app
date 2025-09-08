@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import Tile from "./Tile";
-import { RANKS, FILES, SQUARE_COLORS } from "../../shared/constants/chess";
+import { RANKS, FILES, SQUARE_COLORS, ENGINE_UI_SLOWDOWN_MS } from "../../shared/constants/chess";
 import { processPlayerMove } from "../utils/moveValidation";
 import type { ChessboardProps, Move, MoveList } from "../../shared/types/chess";
 import { EngineAPI } from "../utils/engineApi";
@@ -96,7 +96,11 @@ export default function Chessboard({
     const makeEngineMove = async () => {
       setHandlingMove(true);
       const engine = new EngineAPI(new Client());
-      const { response, newFen, legalMoves } = await engine.getEngineResponse(difficulty);
+      // Slow down ui updates for engine move so that its not jarring for user
+      const slowDown = (ms: number) =>  new Promise(resolve => setTimeout(resolve, ms));
+      const [, { response, newFen, legalMoves }] = await Promise.all([
+        slowDown(ENGINE_UI_SLOWDOWN_MS), 
+        engine.getEngineResponse(difficulty)]);
       const isKingInCheck = await engine.isKingInCheck();
       await applyMove(response, newFen, legalMoves, isKingInCheck);
       setHalfmoveViewIndex(engineHalfmoveIndex);

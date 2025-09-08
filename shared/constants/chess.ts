@@ -42,6 +42,8 @@ export const HEARTBEAT_INTERVAL: number = 5000; // 5 seconds
 export const HEARTBEAT_TIMEOUT: number = 10000; // 10 seconds
 export const RESTORE_INTERVAL: number = 1000; // 1 second
 
+export const ENGINE_UI_SLOWDOWN_MS: number = 500; // 500 milliseconds
+
 // Board dimensions
 export const BOARD_SIZE = 8;
 
