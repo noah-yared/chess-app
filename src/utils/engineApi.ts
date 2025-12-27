@@ -7,15 +7,20 @@ export class EngineAPI {
   private static readonly depthMap: Record<Difficulty, number> = {
     'beginner': 1,
     'novice': 2,
-    'intermediate': 3,
-    'advanced': 5,
-    'expert': 6,
-    'master': 7
+    'intermediate': 4,
+    'advanced': 7,
+    'expert': 7,
+    'master': 8
   };
 
-  private static isEasyMode(difficulty: Difficulty): boolean {
-    return difficulty === 'beginner' || difficulty === 'novice';
-  }
+  private static readonly difficultyLevelMap: Record<Difficulty, number> = {
+    'beginner': 0,
+    'novice': 1,
+    'intermediate': 2,
+    'advanced': 3,
+    'expert': 4,
+    'master': 5
+  };
 
   public async reset(): Promise<void> {
     await this.client.post<void>('/reset');
@@ -45,7 +50,7 @@ export class EngineAPI {
     }>('/engine-move', {
       fen,
       depth: EngineAPI.depthMap[difficulty],
-      easyMode: EngineAPI.isEasyMode(difficulty),
+      difficultyLevel: EngineAPI.difficultyLevelMap[difficulty]
     }); 
     return { response, newFen, legalMoves: new Map(Object.entries(legalMoves)) as MoveList };
   }

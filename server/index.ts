@@ -59,8 +59,8 @@ app.post('/update-fen', async (req, res) => {
 })
 
 app.post('/engine-move', async (req, res) => {
-  const { depth, easyMode } = req.body;
-  const response = await engine.computeEngineMove(depth, easyMode);
+  const { depth, difficultyLevel } = req.body;
+  const response = await engine.computeEngineMove(depth, difficultyLevel);
   const newFen = await engine.computeCurrentFen();
   const legalMoves = await engine.computeLegalMoves(); // cannot serialize a Map
   res.json({ response, newFen, legalMoves: Object.fromEntries(legalMoves) });
