@@ -235,7 +235,7 @@ export function resetGame(
   setHandlingMove(false);
   setIsCurrentKingInCheck(false);
   setEngineSide('b');
-  setDifficulty('intermediate');
+  setDifficulty('medium');
   setIsGameStarted(false);
   setIsGameOver(false);
   setMoveHistory([]);

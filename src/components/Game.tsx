@@ -17,7 +17,7 @@ export default function Game() {
   const [handlingMove, setHandlingMove] = useState(false);
   const [isCurrentKingInCheck, setIsCurrentKingInCheck] = useState(false);
   const [engineSide, setEngineSide] = useState<Color>('b');
-  const [difficulty, setDifficulty] = useState<Difficulty>('intermediate');
+  const [difficulty, setDifficulty] = useState<Difficulty>('medium');
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
   const [moveHistory, setMoveHistory] = useState<Move[]>([])

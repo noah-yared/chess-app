@@ -56,12 +56,9 @@ export default function Menu({
             disabled={isGameStarted}
             className="form-select"
           >
-            <option value="beginner">Beginner</option>
-            <option value="novice">Novice</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
-            <option value="expert">Expert</option>
-            <option value="master">Master</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
           </select>
         </div>
 

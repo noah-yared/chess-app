@@ -4,22 +4,10 @@ import type { Client } from "./client";
 export class EngineAPI {
   constructor(private readonly client: Client) {}
   
-  private static readonly depthMap: Record<Difficulty, number> = {
-    'beginner': 1,
-    'novice': 2,
-    'intermediate': 4,
-    'advanced': 7,
-    'expert': 7,
-    'master': 8
-  };
-
   private static readonly difficultyLevelMap: Record<Difficulty, number> = {
-    'beginner': 0,
-    'novice': 1,
-    'intermediate': 2,
-    'advanced': 3,
-    'expert': 4,
-    'master': 5
+    'low': 0,
+    'medium': 1,
+    'high': 2,
   };
 
   public async reset(): Promise<void> {
@@ -49,7 +37,6 @@ export class EngineAPI {
       legalMoves: { [key: string]: Array<{to: Square, promoting: boolean}> }
     }>('/engine-move', {
       fen,
-      depth: EngineAPI.depthMap[difficulty],
       difficultyLevel: EngineAPI.difficultyLevelMap[difficulty]
     }); 
     return { response, newFen, legalMoves: new Map(Object.entries(legalMoves)) as MoveList };

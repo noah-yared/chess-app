@@ -3,7 +3,7 @@ import type { RefObject } from 'react';
 export type PieceType = 'p' | 'r' | 'n' | 'b' | 'q' | 'k';
 export type Color = 'w' | 'b';
 
-export type Difficulty = 'beginner' | 'novice' | 'intermediate' | 'advanced' | 'expert' | 'master';
+export type Difficulty = 'low' | 'medium' | 'high';
 
 export type Piece = {
   type: PieceType,

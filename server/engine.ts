@@ -116,9 +116,9 @@ export class Engine {
     return moves;
   }
 
-  public async computeEngineMove(depth: number, difficultyLevel: number): Promise<Move> {
-    console.log(`computing engine move with depth ${depth} and difficulty level ${difficultyLevel}`);
-    const result = await this.invokeEngine(`find-best,${depth},${difficultyLevel}`);
+  public async computeEngineMove(difficultyLevel: number): Promise<Move> {
+    console.log(`computing engine move with strength level ${difficultyLevel}`);
+    const result = await this.invokeEngine(`find-best,${difficultyLevel}`);
     const match = result.match(/(?<from>[a-h][1-8])(?<to>[a-h][1-8])(?<promo>[nrbq]?)/);
     const { from, to, promo } = match!.groups!;
     if (promo.length === 0)
