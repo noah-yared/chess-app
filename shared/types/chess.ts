@@ -112,9 +112,10 @@ export type ChessboardProps = {
 
 export type TileProps = {
   notation: Square,
-  occupied: boolean,
   pieceOnTile: Piece | null,
-  bgColor: string,
+  isLightSquare: boolean,
+  isLastMove: boolean,
+  isSelected: boolean,
   firstSelectedTile: Square | null,
   setFirstSelectedTile: (tile: Square | null) => void,
   secondSelectedTile: Square | null,

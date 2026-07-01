@@ -23,7 +23,7 @@ export default function Menu({
 
   return (
     <div className="menu-container">
-      <h1 className="menu-title">Game Menu</h1>
+      <h1 className="menu-title">New game</h1>
       
       <div className="menu-form">
         <div className="form-group">
@@ -68,10 +68,9 @@ export default function Menu({
           disabled={isGameStarted}
           className="start-button"
         >
-          Start Game
+          Start game
         </button>
       </div>
     </div>
   )
 }
-

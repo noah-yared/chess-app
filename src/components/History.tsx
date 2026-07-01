@@ -105,22 +105,35 @@ export default function History({
 
   return (
     <div className='history-container'>
-        {pairMoves(moveHistory)
-          .map((fullmove, fullmoveIndex) => {
-            const whiteHalfmoveIndex = 2 * fullmoveIndex;
-            const blackHalfmoveIndex = 2 * fullmoveIndex + 1;
-            return <div key={fullmoveIndex} className='full-move-box'>
-              <span style={{ fontSize: '20px', textEmphasis: 'Highlight' }}>{`${fullmoveIndex + 1}. `}</span>
-              <button onClick={() => setHalfmoveViewIndex(whiteHalfmoveIndex)}>
-                {renderMove(fullmove[0], whiteHalfmoveIndex)}
-              </button>
-              {fullmove.length === 2 &&
-                <button onClick={() => setHalfmoveViewIndex(blackHalfmoveIndex)}>
+      <div className="history-header">
+        <h2 className="history-title">Moves</h2>
+        <span className="history-count">{moveHistory.length} halfmoves</span>
+      </div>
+      {moveHistory.length === 0 && <p className="history-empty">No moves yet</p>}
+      {pairMoves(moveHistory)
+        .map((fullmove, fullmoveIndex) => {
+          const whiteHalfmoveIndex = 2 * fullmoveIndex;
+          const blackHalfmoveIndex = 2 * fullmoveIndex + 1;
+          return <div key={fullmoveIndex} className='full-move-box'>
+            <span className="move-number">{`${fullmoveIndex + 1}.`}</span>
+            <button
+              type="button"
+              className={`move-button ${halfmoveViewIndex === whiteHalfmoveIndex ? 'is-active' : ''}`}
+              onClick={() => setHalfmoveViewIndex(whiteHalfmoveIndex)}
+            >
+              {renderMove(fullmove[0], whiteHalfmoveIndex)}
+            </button>
+            {fullmove.length === 2 &&
+              <button
+                type="button"
+                className={`move-button ${halfmoveViewIndex === blackHalfmoveIndex ? 'is-active' : ''}`}
+                onClick={() => setHalfmoveViewIndex(blackHalfmoveIndex)}
+              >
                 {renderMove(fullmove[1], blackHalfmoveIndex)}
               </button>}
-            </div>
-          }) 
-        }
+          </div>
+        }) 
+      }
     </div>
   );
 

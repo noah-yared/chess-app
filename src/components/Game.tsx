@@ -92,34 +92,21 @@ export default function Game() {
   }, [turn]);
 
   return (
-    <div className="game-container">
+    <main className={`game-container ${isGameStarted ? 'is-playing' : 'is-setup'}`}>
       {!isGameStarted && (
-        <Menu
-          engineSide={engineSide}
-          setEngineSide={setEngineSide}
-          difficulty={difficulty}
-          setDifficulty={setDifficulty}
-          isGameStarted={isGameStarted}
-          setIsGameStarted={setIsGameStarted}
-        />
+        <aside className="setup-panel" aria-label="New game setup">
+          <Menu
+            engineSide={engineSide}
+            setEngineSide={setEngineSide}
+            difficulty={difficulty}
+            setDifficulty={setDifficulty}
+            isGameStarted={isGameStarted}
+            setIsGameStarted={setIsGameStarted}
+          />
+        </aside>
       )}
       {isGameStarted && (
-        <div className="game-info-container">
-          <History
-            moveHistory={moveHistory}
-            fenHistory={fenHistory}
-            setIsGameOver={setIsGameOver}
-            setIsKingInCheck={setIsCurrentKingInCheck}
-            setBoard={setBoard}
-            setFen={setFen}
-            setViewingOldHalfmove={setViewingOldHalfmove}
-            setTurn={setTurn}
-            setHighlightedTiles={setHighlightedTiles}
-            setFirstSelectedTile={setFirstSelectedTile}
-            setSecondSelectedTile={setSecondSelectedTile}
-            halfmoveViewIndex={halfmoveViewIndex}
-            setHalfmoveViewIndex={setHalfmoveViewIndex}
-          />
+        <aside className="game-info-container" aria-label="Game information">
           <Logger
             turn={turn}
             engineSide={engineSide}
@@ -144,38 +131,55 @@ export default function Game() {
             setHalfmoveViewIndex={setHalfmoveViewIndex}
             validPlayerMoves={validPlayerMoves}
           />
-        </div>
+          <History
+            moveHistory={moveHistory}
+            fenHistory={fenHistory}
+            setIsGameOver={setIsGameOver}
+            setIsKingInCheck={setIsCurrentKingInCheck}
+            setBoard={setBoard}
+            setFen={setFen}
+            setViewingOldHalfmove={setViewingOldHalfmove}
+            setTurn={setTurn}
+            setHighlightedTiles={setHighlightedTiles}
+            setFirstSelectedTile={setFirstSelectedTile}
+            setSecondSelectedTile={setSecondSelectedTile}
+            halfmoveViewIndex={halfmoveViewIndex}
+            setHalfmoveViewIndex={setHalfmoveViewIndex}
+          />
+        </aside>
       )}
-      <Chessboard
-        board={board}
-        setBoard={setBoard}
-        fen={fen}
-        setFen={setFen}
-        turn={turn}
-        setTurn={setTurn}
-        firstSelectedTile={firstSelectedTile}
-        setFirstSelectedTile={setFirstSelectedTile}
-        secondSelectedTile={secondSelectedTile}
-        setSecondSelectedTile={setSecondSelectedTile}
-        highlightedTiles={highlightedTiles}
-        setHighlightedTiles={setHighlightedTiles}
-        handlingMove={handlingMove}
-        setHandlingMove={setHandlingMove}
-        isCurrentKingInCheck={isCurrentKingInCheck}
-        setIsCurrentKingInCheck={setIsCurrentKingInCheck}
-        isGameOver={isGameOver}
-        setIsGameOver={setIsGameOver}
-        engineSide={engineSide} // default to computer playing black
-        isGameStarted={isGameStarted}
-        difficulty={difficulty}
-        viewingOldHalfmove={viewingOldHalfmove}
-        moveHistory={moveHistory}
-        setMoveHistory={setMoveHistory}
-        fenHistory={fenHistory}
-        setFenHistory={setFenHistory}
-        setHalfmoveViewIndex={setHalfmoveViewIndex}
-        validPlayerMoves={validPlayerMoves}
-      />
-    </div>
+      <section className="board-stage" aria-label="Board">
+        <Chessboard
+          board={board}
+          setBoard={setBoard}
+          fen={fen}
+          setFen={setFen}
+          turn={turn}
+          setTurn={setTurn}
+          firstSelectedTile={firstSelectedTile}
+          setFirstSelectedTile={setFirstSelectedTile}
+          secondSelectedTile={secondSelectedTile}
+          setSecondSelectedTile={setSecondSelectedTile}
+          highlightedTiles={highlightedTiles}
+          setHighlightedTiles={setHighlightedTiles}
+          handlingMove={handlingMove}
+          setHandlingMove={setHandlingMove}
+          isCurrentKingInCheck={isCurrentKingInCheck}
+          setIsCurrentKingInCheck={setIsCurrentKingInCheck}
+          isGameOver={isGameOver}
+          setIsGameOver={setIsGameOver}
+          engineSide={engineSide}
+          isGameStarted={isGameStarted}
+          difficulty={difficulty}
+          viewingOldHalfmove={viewingOldHalfmove}
+          moveHistory={moveHistory}
+          setMoveHistory={setMoveHistory}
+          fenHistory={fenHistory}
+          setFenHistory={setFenHistory}
+          setHalfmoveViewIndex={setHalfmoveViewIndex}
+          validPlayerMoves={validPlayerMoves}
+        />
+      </section>
+    </main>
   );
 }

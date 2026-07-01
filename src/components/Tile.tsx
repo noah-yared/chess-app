@@ -1,6 +1,4 @@
 import type { TileProps } from "../../shared/types/chess";
-import emptyTargetIcon from '../assets/target.png';
-import occupiedTargetIcon from '../assets/occupied-target.png';
 
 import wp from '../assets/wp.svg';
 import wn from '../assets/wn.svg';
@@ -21,11 +19,21 @@ const PIECE_ICONS = {
   bp, bn, bb, br, bq, bk,
 };
 
+const PIECE_NAMES = {
+  p: 'pawn',
+  n: 'knight',
+  b: 'bishop',
+  r: 'rook',
+  q: 'queen',
+  k: 'king',
+};
+
 export default function Tile({
   notation,
-  occupied,
   pieceOnTile,
-  bgColor,
+  isLightSquare,
+  isLastMove,
+  isSelected,
   firstSelectedTile,
   setFirstSelectedTile,
   secondSelectedTile,
@@ -38,6 +46,7 @@ export default function Tile({
   engineSide,
   viewingOldHalfmove
 }: TileProps) {
+  const occupied = pieceOnTile !== null;
 
   const handleClick: () => void = () => {
     console.log('clicked square: ', notation);
@@ -57,28 +66,38 @@ export default function Tile({
       if (pieceOnTile?.color !== turn) {
         return setSecondSelectedTile(notation);
       }
-    } 
+    }
     setFirstSelectedTile(notation);
     setSecondSelectedTile(null);
   };
 
   const isCheckedKing = isCurrentKingInCheck && pieceOnTile?.type === 'k' && pieceOnTile?.color === turn;
-  
+  const className = [
+    'chess-square',
+    isLightSquare ? 'light' : 'dark',
+    isLastMove ? 'last-move' : '',
+    isSelected ? 'selected' : '',
+    isDestinationTile ? 'legal-target' : '',
+    isDestinationTile && occupied ? 'occupied-target' : '',
+    isCheckedKing ? 'checked-king' : '',
+  ].filter(Boolean).join(' ');
+
   return (
-    <div 
-      className={`${notation} ${bgColor} ${isCheckedKing ? 'checked-king' : ''}`} 
-      style={{ backgroundColor: (!isCheckedKing ? bgColor : undefined) }}
+    <button
+      type="button"
+      className={className}
       onClick={handleClick}
+      aria-label={`Square ${notation}`}
     >
       {occupied && pieceOnTile && (
-        <img src={PIECE_ICONS[`${pieceOnTile.color}${pieceOnTile.type}`]} width="80%" height="80%" className="piece-icon" /> 
+        <img
+          src={PIECE_ICONS[`${pieceOnTile.color}${pieceOnTile.type}`]}
+          className="chess-piece"
+          alt={`${pieceOnTile.color === 'w' ? 'White' : 'Black'} ${PIECE_NAMES[pieceOnTile.type]}`}
+          draggable={false}
+        />
       )}
-      {isDestinationTile && !occupied && (
-        <img src={emptyTargetIcon} className="target-icon" id="empty" />
-      )}
-      {isDestinationTile && occupied && (
-        <img src={occupiedTargetIcon} className="target-icon" id="occupied" />
-      )}
-    </div>
+      {isDestinationTile && <span className="legal-move-indicator" aria-hidden="true" />}
+    </button>
   )
 }

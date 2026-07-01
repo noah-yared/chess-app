@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import Tile from "./Tile";
-import { RANKS, FILES, SQUARE_COLORS, ENGINE_UI_SLOWDOWN_MS } from "../../shared/constants/chess";
+import { RANKS, FILES, ENGINE_UI_SLOWDOWN_MS } from "../../shared/constants/chess";
 import { processPlayerMove } from "../utils/moveValidation";
 import type { ChessboardProps, Move, MoveList } from "../../shared/types/chess";
 import { EngineAPI } from "../utils/engineApi";
@@ -99,7 +99,7 @@ export default function Chessboard({
       // Slow down ui updates for engine move so that its not jarring for user
       const slowDown = (ms: number) =>  new Promise(resolve => setTimeout(resolve, ms));
       const [, { response, newFen, legalMoves }] = await Promise.all([
-        slowDown(ENGINE_UI_SLOWDOWN_MS), 
+        slowDown(ENGINE_UI_SLOWDOWN_MS),
         engine.getEngineResponse(difficulty)]);
       const isKingInCheck = await engine.isKingInCheck();
       await applyMove(response, newFen, legalMoves, isKingInCheck);
@@ -120,21 +120,19 @@ export default function Chessboard({
   ]);
 
   return (
-    <div className='chessboard'>
+    <div className='chessboard' aria-label="Chess board">
       {board.flatMap((row, rowIndex) => {
         return row.map((tile, colIndex) => {
-          const defaultBgColor = (rowIndex + colIndex) % 2 === 0 ? SQUARE_COLORS.LIGHT : SQUARE_COLORS.DARK;
           const notation = `${FILES[colIndex]}${RANKS[rowIndex]}` as const;
           const { from, to } = highlightedTiles ?? { from: null, to: null };
-          const bgColor = from === notation || to === notation  ? 'lightgreen' :
-            notation === firstSelectedTile ? 'yellow' : defaultBgColor;
           const isDestinationTile = firstSelectedTile !== null && secondSelectedTile === null &&
             (validPlayerMoves.current.get(firstSelectedTile)?.some(other => other.to === notation) ?? false);
           return <Tile key={notation}
-                       notation={notation} 
-                       occupied={tile !== null} 
-                       pieceOnTile={tile} 
-                       bgColor={bgColor}
+                       notation={notation}
+                       pieceOnTile={tile}
+                       isLightSquare={(rowIndex + colIndex) % 2 === 0}
+                       isLastMove={from === notation || to === notation}
+                       isSelected={notation === firstSelectedTile}
                        firstSelectedTile={firstSelectedTile}
                        setFirstSelectedTile={setFirstSelectedTile}
                        secondSelectedTile={secondSelectedTile}

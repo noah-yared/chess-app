@@ -27,7 +27,7 @@ export default function Logger({
   validPlayerMoves,
 }: LoggerProps) {
   const isEngineToMove: boolean = turn === engineSide;
-  
+
   const reset = () => resetGame(
     setBoard,
     setFen,
@@ -47,17 +47,18 @@ export default function Logger({
     setHalfmoveViewIndex,
     validPlayerMoves,
   );
-  
+
   const turnStatusElement = (
     <>
     {isGameOver && (
       <h2 className={'status-message game-over'}>
-        Game has ended!
+        Game ended
       </h2>
     )}
     {!isGameOver && viewingOldHalfmove && (
       <h2 className={`status-message history-viewing`}>
-        {"Viewing history 📜"}<br/>{"Click last move to continue ⏩"}
+        <span>Reviewing history</span>
+        <small>Select the latest move to resume</small>
       </h2>
     )}
     {!isGameOver && !viewingOldHalfmove && (
@@ -65,18 +66,18 @@ export default function Logger({
         isEngineToMove ? "engine-thinking" :
                          "player-turn"
       }`}>
-        {isEngineToMove ? "Engine is thinking..."
-                        : "Waiting on your move..."}
+        {isEngineToMove ? "Engine thinking"
+                        : "Your move"}
       </h2>
     )}
     </>
   );
-  
+
   const gameStatusElement = (
     <>
     {!isGameOver && isCurrentKingInCheck && (
-      <h2 className={`status-message`}>
-        {`${(turn == 'w') ? "White" : "Black"} is in check!`}
+      <h2 className={`status-message checkmate`}>
+        {`${(turn == 'w') ? "White" : "Black"} is in check`}
       </h2>
     )}
     {isGameOver ? (
@@ -84,18 +85,31 @@ export default function Logger({
         isCurrentKingInCheck ? `checkmate ${turn === 'w' ? 'black' : 'white'}-wins`
                              : "stalemate"
       }`}>
-        {isCurrentKingInCheck ? `${turn === 'w' ? 'Black' : 'White'} wins by checkmate!`
-                              : "Draw by stalemate!"}
+        {isCurrentKingInCheck ? `${turn === 'w' ? 'Black' : 'White'} wins by checkmate`
+                              : "Draw by stalemate"}
       </h2>
     ) : null}
     </>
   );
-      
+
   return (
     <div className='logger-container'>
-      {turnStatusElement}
-      {gameStatusElement}
-      <button onClick={reset}>{isGameOver ? "Play new game" : "Restart game"}</button>
+      <div className="status-stack">
+        {turnStatusElement}
+        {gameStatusElement}
+      </div>
+      <div className="controls-toolbar" aria-label="Game controls">
+        <button
+          type="button"
+          className="control-button primary"
+          onClick={reset}
+          aria-label={isGameOver ? "Start a new game" : "Restart game"}
+          title={isGameOver ? "Start a new game" : "Restart game"}
+        >
+          <span className="control-button-icon" aria-hidden="true">↻</span>
+          <span>{isGameOver ? "New game" : "Reset"}</span>
+        </button>
+      </div>
     </div>
   );
 }
